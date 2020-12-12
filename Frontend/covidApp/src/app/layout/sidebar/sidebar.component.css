@@ -1,0 +1,11 @@
+
+body{
+  /* background-color: aqua; */
+  color: black;
+  background-color: primary;
+}
+
+.with-icon {
+  display: flex;
+  align-items: center;
+}

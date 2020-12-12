@@ -1,0 +1,18 @@
+
+<body class="color-primary">
+
+
+    <mat-selection-list #menu [multiple]="false" >
+      <mat-list-option *ngFor="let menu of optionsList" [value]="menu" style="top: 0;">
+
+        <div class="with-icon">
+          <mat-icon>{{ menu[0]}}</mat-icon>
+         <b> {{ menu[1]}} </b>
+        </div>
+
+      </mat-list-option>
+    </mat-selection-list>
+</body>
+
+
+
