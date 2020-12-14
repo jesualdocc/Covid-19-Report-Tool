@@ -1,1 +1,136 @@
-<p>registration works!</p>
+<mat-card >
+
+  <mat-toolbar color="primary" fxLayoutAlign="center center">Registration</mat-toolbar>
+  <br>
+  <div class="container" style="width:50%">
+    <div [hidden]="submitted">
+
+      <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" class="form-control" id="firstName" required [(ngModel)]="model.firstName" name="firstName"
+            #fname="ngModel" placeholder="Enter First Name"/>
+
+          <div *ngIf="fname.invalid && (fname.dirty || fname.touched)" class="alert alert-danger">
+
+            <div *ngIf="fname.errors.required">
+              First Name is required.
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" class="form-control" id="lastName" required [(ngModel)]="model.lastName" name="lastName"
+            #lname="ngModel" placeholder="Enter Last Name">
+
+          <div *ngIf="lname.invalid && (lname.dirty || lname.touched)" class="alert alert-danger">
+
+            <div *ngIf="lname.errors.required">
+              Last Name is required.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="userName">Username</label>
+          <input type="text" class="form-control" id="userName" required [(ngModel)]="model.userName" name="userName"
+            #uname="ngModel" placeholder="Enter Username">
+
+          <div *ngIf="uname.invalid && (uname.dirty || uname.touched)" class="alert alert-danger">
+
+            <div *ngIf="uname.errors.required">
+              UserName is required.
+            </div>
+          </div>
+
+          <div *ngIf="uname.valid">
+            {{checkUsername}}
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="text" class="form-control" id="email" required email [(ngModel)]="model.email" name="email"
+            #email="ngModel" placeholder="Enter Email">
+
+          <div *ngIf="email.invalid && email.touched" class="alert alert-danger">
+
+            <div *ngIf="email.errors.required">
+              Email is required.
+            </div>
+
+            <div *ngIf="email.errors.email">
+              Invalid Email Format
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" required minlength="6" [(ngModel)]="model.password" name="password"
+            #password="ngModel" placeholder="Enter Password">
+
+          <div *ngIf="password.invalid && password.touched" class="alert alert-danger">
+
+            <div *ngIf="password.errors.required">
+              Password is required.
+            </div>
+
+            <div *ngIf="password.errors.minlength">
+              Invalid Password: Minimum Length 6
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="state">State</label>
+          <select class="form-control" id="role" required [(ngModel)]="model.state" name="state" #state="ngModel"
+            placeholder="d.ff">
+            <option hidden value="" disabled selected>Select State </option>>
+            <option *ngFor="let state of states" [value]="state">{{state.name}}</option>
+          </select>
+
+          <div *ngIf="state.invalid && state.touched" class="alert alert-danger">
+
+            <div *ngIf="state.errors.required">
+              State is required.
+            </div>
+          </div>
+
+        </div>
+
+
+
+
+        <br>
+        <div style="text-align: center;">
+        <button type="submit" class="btn btn-success" [disabled]="!userForm.form.valid">Submit</button>
+        <span style="margin-left: 4em;"></span>
+        <button type="button" mat-raised-button color="basic" class="btn btn-default"
+          (click)="clearForm(); userForm.reset()">Clear</button>
+
+          <span style="margin-left: 4em;"></span>
+
+          <button type="button" mat-raised-button class="btn btn-danger"
+          (click)="clearForm(); userForm.reset(); cancel()">Cancel</button>
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{submissionMessage}}
+        </div>
+      </div>
+      </form>
+    </div>
+
+
+
+
+
+
+

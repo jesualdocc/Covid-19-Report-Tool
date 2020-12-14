@@ -1,3 +1,4 @@
+import { RegistrationComponent } from './registration/registration.component';
 import { LoginComponent } from './login/login.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -23,14 +24,15 @@ const routes: Routes = [
   loadChildren:() => import('./dashboard/dashboard.module').then(m=> m.DashboardModule),
   data: { showHeader:true, showSidebar:true}
 },
-// {
-//   path:'login',
-//   loadChildren:() => import('./login/login.module').then(m=> m.LoginModule),
-//   data: { showHeader:false, showSidebar:false}
-// },
+{
+  path:'reports',
+  loadChildren:() => import('./reports/reports.module').then(m=> m.ReportsModule),
+  data: { showHeader:true, showSidebar:true}
+},
+
 {
   path:'registration',
-  loadChildren:() => import('./registration/registration.module').then(m=> m.RegistrationModule),
+  component:RegistrationComponent,
   data: { showHeader:false, showSidebar:false}
 }
 

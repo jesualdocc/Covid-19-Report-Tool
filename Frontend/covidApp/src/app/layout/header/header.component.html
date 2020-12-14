@@ -1,14 +1,14 @@
 
-  <mat-toolbar color="primary">
-    <button mat-icon-button class="example-icon" (click)="sidebarDisplay()">
+  <mat-toolbar color="primary" >
+    <button mat-icon-button class="example-icon" (click)="sidebarDisplay()" *ngIf="!homePage">
       <mat-icon>menu</mat-icon>
     </button>
-    <span>{{pageTitle}}</span>
+    <span class="title-center">{{pageTitle}}</span>
 
 
     <span class="buttonspacer"></span>
-    <button mat-icon-button class="example-icon favorite-icon" >
-      <mat-icon>favorite</mat-icon>
+    <button mat-icon-button class="example-icon favorite-icon" (click)="login()">
+      <mat-icon>login</mat-icon>
     </button>
 
     <button mat-icon-button class="example-icon" >

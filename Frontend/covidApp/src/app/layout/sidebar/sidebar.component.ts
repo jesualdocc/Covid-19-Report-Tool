@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -7,12 +8,31 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SidebarComponent implements OnInit {
 
-  optionsList = [["dashboard"," Dashboard"],["analytics"," Reports"],["people"," Twitter Feed"], ["settings","Settings"]];
+  selectedRoute:any;
+  optionsList = [["dashboard","Dashboard"],["analytics","Reports"],["people","Twitter Feed"], ["settings","Settings"]];
 
 
-  constructor() { }
+  constructor(private router: Router,) { }
 
   ngOnInit(): void {
   }
 
+  goTo(selection:any){
+    var route;
+    if(selection[1] == 'Dashboard'){
+      route = '/dashboard';
+    }
+    if(selection[1] == 'Reports'){
+      route = '/reports';
+    }
+    if(selection[1] == 'Twitter Feed'){
+      route = '/twitter';
+    }
+    if(selection[1] == 'Settings'){
+      route = '/settings';
+    }
+
+    this.router.navigate([route])
+    console.log(route);
+  }
 }

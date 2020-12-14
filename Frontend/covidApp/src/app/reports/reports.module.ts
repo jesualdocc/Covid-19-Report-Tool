@@ -1,21 +1,20 @@
-import { HomeComponent } from './home.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule, Routes } from '@angular/router';
+import {ReportsComponent} from './reports.component';
+import {MatTabsModule} from '@angular/material/tabs';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent }
+  { path: '', component: ReportsComponent }
 ];
 
-
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [ReportsComponent],
   imports: [
     CommonModule,
-    MatSidenavModule,
+    MatTabsModule,
     RouterModule.forChild(routes)
   ],
   exports: [RouterModule]
 })
-export class HomeModule { }
+export class ReportsModule { }

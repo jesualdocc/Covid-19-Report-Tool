@@ -1,26 +1,18 @@
 
-<!-- Header -->
 <header class="bar">
   <app-header *ngIf="showHeader" fxLayout="column" ></app-header>
 </header>
 
-<body>
   <div fxLayout="row" fxFlex="100">
 
-    <app-sidebar *ngIf="showSidebar && activeMenu" fxLayout="column" fxFlex="250px" class="bar"></app-sidebar>
+    <app-sidebar  *ngIf="showSidebar && activeMenu" fxLayout="column" fxFlex="250px" class="bar"></app-sidebar>
 
     <div class="content" fxLayout="column" fxFlex>
-      <router-outlet></router-outlet>
+      <router-outlet ></router-outlet>
     </div>
 
   </div>
 
-</body>
 
-
-<!-- Footer -->
-<footer>
-  <app-footer *ngIf="showFooter" fxLayout="column"></app-footer>
-</footer>
 
 

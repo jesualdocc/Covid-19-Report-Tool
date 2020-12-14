@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './dashboard.component';
 import { RouterModule, Routes } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 
 const routes: Routes = [
@@ -14,6 +15,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     MatSidenavModule,
+    MatGridListModule,
     RouterModule.forChild(routes)
   ],
   exports: [RouterModule]

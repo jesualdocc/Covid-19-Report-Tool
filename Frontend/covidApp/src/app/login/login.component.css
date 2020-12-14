@@ -1,0 +1,30 @@
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+ }
+
+ .main-div mat-card{
+  padding:0px;
+
+}
+
+.login-form{
+  padding: 20px;
+}
+
+
+ .mat-card{
+
+  padding:0 !important;
+}
+
+.mat-card-content{
+  padding:5px !important;
+}
+
+.verticalalign {
+  position: relative;
+  top: 50%;
+
+}

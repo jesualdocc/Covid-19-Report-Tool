@@ -9,10 +9,9 @@ import { NavigationEnd, Router } from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
 
-  @Output() toggleSidenav = new EventEmitter<void>();
-  private returnUrl:string = '/';
   public sidebarStatus:boolean = false;
   public pageTitle:string;
+  public homePage:boolean;
 
   constructor(private router: Router, private dataService:DataService) {
 
@@ -27,7 +26,12 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
 
     this.dataService.currentPageTitle.subscribe(t=> this.pageTitle = t);
+    this.homePage = this.pageTitle == "Covid Report" ? true : false;
 
+  }
+
+  login():void{
+    this.router.navigate(['/login']);
   }
 
 }

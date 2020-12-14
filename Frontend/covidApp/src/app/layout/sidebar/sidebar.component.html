@@ -1,18 +1,23 @@
 
-<body class="color-primary">
-
+<div >
+<body class="color-primary" >
 
     <mat-selection-list #menu [multiple]="false" >
-      <mat-list-option *ngFor="let menu of optionsList" [value]="menu" style="top: 0;">
+      <mat-list-option *ngFor="let menu of optionsList" [value]="menu" style="top: 0;"
+      (click)="goTo(menu)">
 
         <div class="with-icon">
-          <mat-icon>{{ menu[0]}}</mat-icon>
-         <b> {{ menu[1]}} </b>
+
+            <mat-icon>{{ menu[0]}}</mat-icon>
+
+         <div class="spacing"> <b>{{menu[1]}}</b> </div>
         </div>
 
       </mat-list-option>
-    </mat-selection-list>
+    </mat-selection-list >
+
 </body>
+</div>
 
 
 

@@ -9,3 +9,7 @@ body{
   display: flex;
   align-items: center;
 }
+
+.spacing{
+  margin-left: 2mm;
+}

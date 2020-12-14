@@ -6,6 +6,7 @@
 
 
 .bar{
-  border:solid 0.5mm;
+  /* border:solid 0.5mm; */
   align-items:center;
 }
+
