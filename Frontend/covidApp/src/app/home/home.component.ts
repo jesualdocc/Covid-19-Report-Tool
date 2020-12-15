@@ -11,6 +11,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private dataService:DataService) {
     this.dataService.changePageTitle(this.title);
+
   }
 
   ngOnInit(): void {

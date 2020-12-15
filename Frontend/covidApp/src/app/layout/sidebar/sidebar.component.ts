@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class SidebarComponent implements OnInit {
 
   selectedRoute:any;
-  optionsList = [["dashboard","Dashboard"],["analytics","Reports"],["people","Twitter Feed"], ["settings","Settings"]];
+  optionsList = [["dashboard","Dashboard"],["analytics","Reports"],["people","Twitter Feed"], ["settings","Account Settings"]];
 
 
   constructor(private router: Router,) { }
@@ -28,11 +28,10 @@ export class SidebarComponent implements OnInit {
     if(selection[1] == 'Twitter Feed'){
       route = '/twitter';
     }
-    if(selection[1] == 'Settings'){
+    if(selection[1] == 'Account Settings'){
       route = '/settings';
     }
 
     this.router.navigate([route])
-    console.log(route);
   }
 }

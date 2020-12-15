@@ -1,18 +1,25 @@
 
   <mat-toolbar color="primary" >
-    <button mat-icon-button class="example-icon" (click)="sidebarDisplay()" *ngIf="!homePage">
+    <button mat-icon-button class="example-icon" (click)="sidebarDisplay()" *ngIf="!homePage"
+    title="Menu">
       <mat-icon>menu</mat-icon>
     </button>
     <span class="title-center">{{pageTitle}}</span>
 
 
     <span class="buttonspacer"></span>
-    <button mat-icon-button class="example-icon favorite-icon" (click)="login()">
+    <button *ngIf="!isLoggedin" mat-icon-button class="example-icon favorite-icon" (click)="login()"
+    title="Login">
       <mat-icon>login</mat-icon>
     </button>
 
-    <button mat-icon-button class="example-icon" >
-      <mat-icon>share</mat-icon>
+    <button *ngIf="isLoggedin" mat-icon-button class="example-icon favorite-icon" (click)="logout()"
+    title="Logout">
+      <mat-icon>power_settings_new</mat-icon>
+    </button>
+
+    <button mat-icon-button class="example-icon" routerLink="settings" title="Settings" >
+      <mat-icon>settings</mat-icon>
     </button>
 
 

@@ -10,3 +10,13 @@
   align-items:center;
 }
 
+.content{
+  border:solid;
+  height:100vh;
+}
+
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+ }

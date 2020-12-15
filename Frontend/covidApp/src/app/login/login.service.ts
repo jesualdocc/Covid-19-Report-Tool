@@ -1,3 +1,4 @@
+import { DataService } from './../services/data.service';
 import { ILogin} from './login';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
@@ -13,7 +14,8 @@ export class LoginService {
 token:string;
 isLoggedIn:boolean;
 
-  constructor(private http:HttpClient, private localStorage:LocalStorageService, private router:Router) {
+  constructor(private http:HttpClient, private localStorage:LocalStorageService,
+     private router:Router) {
   }
 
   loginHandler(data:ILogin):Observable<ILogin>{

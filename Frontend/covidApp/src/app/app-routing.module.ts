@@ -29,7 +29,11 @@ const routes: Routes = [
   loadChildren:() => import('./reports/reports.module').then(m=> m.ReportsModule),
   data: { showHeader:true, showSidebar:true}
 },
-
+{
+  path:'settings',
+  loadChildren:() => import('./settings/settings.module').then(m=> m.SettingsModule),
+  data: { showHeader:true, showSidebar:true}
+},
 {
   path:'registration',
   component:RegistrationComponent,

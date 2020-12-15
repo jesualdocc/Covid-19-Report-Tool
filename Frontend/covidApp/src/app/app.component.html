@@ -3,7 +3,7 @@
   <app-header *ngIf="showHeader" fxLayout="column" ></app-header>
 </header>
 
-  <div fxLayout="row" fxFlex="100">
+  <div fxLayout="row" fxFlex="100" >
 
     <app-sidebar  *ngIf="showSidebar && activeMenu" fxLayout="column" fxFlex="250px" class="bar"></app-sidebar>
 
@@ -12,6 +12,10 @@
     </div>
 
   </div>
+
+  <footer>
+    <app-footer></app-footer>
+  </footer>
 
 
 

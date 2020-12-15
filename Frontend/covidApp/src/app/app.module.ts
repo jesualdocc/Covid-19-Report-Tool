@@ -37,7 +37,6 @@ import {MatSelectModule} from '@angular/material/select';
     HeaderComponent,
     FooterComponent,
     SidebarComponent,
-    SettingsComponent,
     LoginComponent,
     RegistrationComponent
 

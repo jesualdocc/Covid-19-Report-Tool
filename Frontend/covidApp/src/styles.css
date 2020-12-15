@@ -7,8 +7,3 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
   justify-content: center;
 }
 
-footer {
-  position: relative;
-  bottom: 0;
-  width: 100%;
- }
