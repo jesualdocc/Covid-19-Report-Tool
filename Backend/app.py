@@ -9,6 +9,7 @@ import jwt
 from datetime import datetime, timedelta 
 from functools import wraps 
 from tables import convert_user_tuple_to_dict, convert_email_username_tuple_to_dict
+import asyncio
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -46,14 +47,15 @@ def token_required(f):
 @app.route('/login', methods=['POST'])
 def login():
     global sql
-    result = request.json
-    
+   
     if 'userName' in request.json and 'password' in request.json:
+        
         user = sql.find_users(request.json['userName'])
+       
         if user is None:
             return jsonify({'message': 'Username or Password is incorrect'}), 401
 
-        if not check_password_hash(user[5], request.json['password']):
+        if check_password_hash(user[5], request.json['password']):
          
             user_dict = convert_user_tuple_to_dict(user)
             # generates the JWT Token with an expiration time
@@ -71,7 +73,6 @@ def list_of_email_username():
     global sql 
     users = sql.find_users()
     users_dict = convert_email_username_tuple_to_dict(users)
-
     return make_response(jsonify({'users':users_dict}), 200)
 
         
@@ -79,10 +80,11 @@ def list_of_email_username():
 @app.route('/registration', methods=['POST'])
 def registration():
     global sql
-    result = request.form.to_dict()
+    result = request.json
     try:
         password = result['password']
         result['password'] = generate_password_hash(password)
+        
         sql.add_user(result)
         
         return jsonify({'message': 'Succesfull'}), 201
@@ -94,39 +96,40 @@ def registration():
 @app.route('/data',methods = ['GET'])
 def data():
     global sql
-    result = request.form.to_dict()
-    if 'county' in request.form and 'state' in request.form:
+    
+    if 'county' in request.json and 'state' in request.json:
         
-        county = request.form['county']
-        state = request.form['state']
+        county = request.json['county']
+        state = request.json['state']
         fips = sql.get_fips(state,county)
         data = None
 
         if fips is None:
             return jsonify({"ERROR":"COUNTY AND STATE MISMATCH",'request':result}), 204 #No Content
 
-        if 'days' in request.form and request.form['days'].isdigit():
-            data = sql.get_county_info(fips,request.form['days'])
+        if 'days' in request.json and request.json['days'].isdigit():
+            data = sql.get_county_info(fips,request.json['days'])
         else:
             data = sql.get_county_info(fips)
 
-        return jsonify({'request':result,"fips":fips,'data':data}), 200
+        return make_response(jsonify({"fips":fips,'data':data}), 200)
     
     else:
-        return jsonify({'request':result}), 400
+        return make_response(jsonify({}), 400)
    
    
 #Returns list of counties
 @app.route('/counties', methods=['GET'])
 def get_counties():
     global sql
-    result = request.form.to_dict()
-
+   
     try:
+        
         counties = sql.get_counties()
-        return jsonify({'request':result,"data":counties}), 200
+        
+        return make_response(jsonify({'data':counties}), 200)
     except:
-        return jsonify({'request':result}), 500
+        return make_response(jsonify({'request':{}}), 500)
 
    
 #Returns predictions of cases/deaths by county

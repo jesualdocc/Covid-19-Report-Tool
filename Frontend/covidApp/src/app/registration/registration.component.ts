@@ -13,7 +13,7 @@ import { DataService } from '../services/data.service';
 export class RegistrationComponent implements OnInit {
 
   states = usStates;
-  counties:any;
+  counties = [];
   model = new Users();
   submitted = false;
   submissionMessage = '';
@@ -27,6 +27,18 @@ export class RegistrationComponent implements OnInit {
 
     return this.model.password == this.checkMatch ? true:false;
 
+  }
+
+  //Assures that county and states are selected (used along with form.valid)
+  get areSelected():boolean{
+    if(this.model.county == null || this.model.county == undefined || this.model.county == ""){
+      return false;
+    }
+    if(this.model.county == null || this.model.county == undefined || this.model.county == ""){
+      return false;
+    }
+
+    return true;
   }
 
   //Property that get checks in realtime
@@ -47,7 +59,26 @@ export class RegistrationComponent implements OnInit {
   ngOnInit(): void {
 
     this.getAll();
+    this.getCounties();
 
+  }
+
+  getCounties(){
+    this.dataService.getCounties().subscribe(data=>{
+      if(data.status == 200){
+
+        var result = data['body'].data
+        for(var i of result){
+
+          if(!this.counties.includes(i[2]))
+            this.counties.push(i[2])
+        }
+
+        this.counties.sort()
+      }
+
+
+    })
   }
 
   onSubmit(){
@@ -67,21 +98,27 @@ export class RegistrationComponent implements OnInit {
 
   getAll(){
     this.dataService.getAllUsers().subscribe(data=>{
-    var result = data['users']
-    var emails = result['email']
-    var usernames = result['userName']
+      if(data.status == 200){
 
-      for(var i in emails){
+        var result = data['body'].users;
+        var emails = result['email']
 
-      this.emailList.push(emails[i]);
-      this.usernameList.push(usernames[i]);
+        var usernames = result['userName']
+
+          for(var i in emails){
+
+          this.emailList.push(emails[i]);
+          this.usernameList.push(usernames[i]);
+          }
       }
+
 
     });}
 
   sendData(){
+    console.log(this.model)
     this.dataService.addUser(this.model).subscribe(result=>{
-    if(result['ok'] == 1){
+    if(result.status == 201){
       this.errorMessage = false;
       this.submitted = true;
       this.submissionMessage = '';

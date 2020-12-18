@@ -147,7 +147,7 @@
 
         <br>
         <div style="text-align: center;">
-        <button type="submit" class="btn btn-success" [disabled]="!userForm.form.valid && !passwordMatch">Submit</button>
+        <button type="submit" class="btn btn-success" [disabled]="!userForm.form.valid || !passwordMatch || !areSelected">Submit</button>
         <span style="margin-left: 4em;"></span>
         <button type="button" mat-raised-button color="basic" class="btn btn-default"
           (click)="clearForm(); userForm.reset()">Clear</button>

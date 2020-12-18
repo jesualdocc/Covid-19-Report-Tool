@@ -9,12 +9,18 @@ def convert_user_tuple_to_dict(user:tuple):
     
     return dictionary
 
+
 #Converts list of email and username already registered (tuple to dict)
 def convert_email_username_tuple_to_dict(user:tuple):
     dictionary = {}
-    users_table = ('email', 'userName')
-    for i in range(len(users_table)):
-        key = users_table[i]
-        dictionary[key] = user[i] 
+    emails = []
+    usernames = []
+    for i in range(len(user)):
+        
+        emails.append(user[i][0]) 
+        usernames.append(user[i][1])
+
+    dictionary['email'] = emails
+    dictionary['userName'] = usernames    
     
     return dictionary

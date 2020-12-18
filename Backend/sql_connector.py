@@ -13,7 +13,6 @@ class SQLConnector(object):
 
     def __init__(self, host,user,password,database):
         self.db = mysql.connector.connect(host=host,user=user,password=password,database = database)
-        #print(self.db)
         self.cursor = self.db.cursor()
 
     def get_tables(self):
@@ -23,7 +22,7 @@ class SQLConnector(object):
 
     def create_user_table(self):
         self.cursor.execute("DROP TABLE IF EXISTS " + "users")
-        sql = "CREATE TABLE "+ "users " +"(id int NOT NULL AUTO_INCREMENT,firstName VARCHAR(45) NOT NULL, lastName VARCHAR(45) NOT NULL,email VARCHAR(45) NOT NULL,userName VARCHAR(45) NOT NULL, password VARCHAR(45) NOT NULL,county VARCHAR(45) NOT NULL, state VARCHAR(45) NOT NULL,PRIMARY KEY (id), UNIQUE(userName), UNIQUE(email));"
+        sql = "CREATE TABLE "+ "users " +"(id int NOT NULL AUTO_INCREMENT,firstName VARCHAR(45) NOT NULL, lastName VARCHAR(45) NOT NULL,email VARCHAR(45) NOT NULL,userName VARCHAR(45) NOT NULL, password VARCHAR(200) NOT NULL,county VARCHAR(45) NOT NULL, state VARCHAR(45) NOT NULL,PRIMARY KEY (id), UNIQUE(userName), UNIQUE(email));"
         self.cursor.execute(sql)
 
     def create_county_table(self,table_name,data,force_drop = True):
@@ -72,7 +71,7 @@ class SQLConnector(object):
         #Function to retrieve users from db (all and by id)
         if username is None:
             #Returns list of usernames and emails already registered
-            query = "SELECT email,userName FROM users"
+            query = "SELECT email, userName FROM users"
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -84,6 +83,7 @@ class SQLConnector(object):
             return result
 
     def add_user(self, user:dict):
+        #Function to add new user
         query = "INSERT INTO `users` (`firstName`, `lastName`, `email`, `userName`, `password`, `county`, `state`) "
         values = f"VALUES ('{user['firstName']}', '{user['lastName']}', '{user['email']}', '{user['userName']}', '{user['password']}', '{user['county']}', '{user['state']}'); "
         
@@ -96,6 +96,7 @@ class SQLConnector(object):
             return False
 
     def update_user(self, user:dict):
+        #Function to updater user info
         query = f"UPDATE `users` SET 'firstName' ='{user['firstName']}', 'lastName' = '{user['lastName']}'', `email`='{user['email']}',"
         queryCont = f" `userName`= '{user['userName']}', `password`='{user['password']}', `county`='{user['county']}', `state` ='{user['state']}' "
         condition = f"WHERE 'id'='{user['id']}'"
@@ -239,7 +240,8 @@ class SQLConnector(object):
 
 if __name__=="__main__":
     pass
-    #sql = SQLConnector("localhost","root","Jesualdo2020","coviddb")
+    sql = SQLConnector("localhost","root","Jesualdo2020","coviddb")
+    #sql.create_user_table()
     
    
     #sql.insert_history_data()
