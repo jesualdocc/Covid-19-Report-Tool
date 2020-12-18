@@ -1,3 +1,6 @@
+import { CovidtableComponent } from './reports/covidtable/covidtable.component';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { HomeComponent } from './home/home.component';
 import { RegistrationComponent } from './registration/registration.component';
 import { LoginComponent } from './login/login.component';
@@ -26,10 +29,13 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import { NgxWebstorageModule } from 'ngx-webstorage';
 import { HttpClientModule } from '@angular/common/http';
 import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
+import { TestComponent } from './test/test.component';
+import { MatTableModule } from '@angular/material/table';
+
 
 @NgModule({
   declarations: [
@@ -38,8 +44,8 @@ import {MatSelectModule} from '@angular/material/select';
     FooterComponent,
     SidebarComponent,
     LoginComponent,
-    RegistrationComponent
-
+    RegistrationComponent,
+    TestComponent
   ],
   imports: [
     BrowserModule,
@@ -64,6 +70,10 @@ import {MatSelectModule} from '@angular/material/select';
     MatCardModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatTabsModule,
+    MatTableModule,
     NgxWebstorageModule.forRoot(),
 
   ],

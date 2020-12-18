@@ -1,0 +1,19 @@
+.titleDiv {
+  align-items:center;
+}
+
+
+
+/* table tr.highlight {
+  background-color: #4CAF50 !important;
+  color: #1549da;
+} */
+
+table {
+  width: 100%;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}

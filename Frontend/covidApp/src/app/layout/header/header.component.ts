@@ -1,6 +1,6 @@
 import { DataService } from './../../services/data.service';
-import { Component, EventEmitter, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { LoginService } from 'src/app/login/login.service';
 
 @Component({
@@ -19,6 +19,7 @@ export class HeaderComponent implements OnInit{
     private loginService:LoginService) {
   }
 
+  //Function to toggle sidemenu
   sidebarDisplay():void{
     this.sidebarStatus = !this.sidebarStatus;
     this.dataService.showSideBar(this.sidebarStatus);
@@ -26,8 +27,13 @@ export class HeaderComponent implements OnInit{
 
   ngOnInit(): void {
 
+    //Subscribe to service that keeps tracks of each page title (updates main title variable)
     this.dataService.currentPageTitle.subscribe(t=> this.pageTitle = t);
+
+    //Checks if user is logged (display different icons for login/out)
     this.isLoggedin = this.loginService.isLoggedIn;
+
+    //Check if it's homepage to hide/show sidemenu (doesnt show on homepage)
     this.homePage = this.pageTitle == "Covid Report" ? true : false;
 
   }

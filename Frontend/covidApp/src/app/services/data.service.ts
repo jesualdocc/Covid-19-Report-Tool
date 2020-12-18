@@ -1,8 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { LoginService } from 'src/app/login/login.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
 import { Users } from '../registration/Users';
+import { ICovidData } from '../reports/CovidData';
 import { baseUrl, baseTestingUrl } from './../../environments/environment';
 
 @Injectable({
@@ -11,15 +13,16 @@ import { baseUrl, baseTestingUrl } from './../../environments/environment';
 
 //Service to share data between unrelated components
 export class DataService {
-  mainRoute:string;
+
+mainRoute:string;
 private sidebar = new BehaviorSubject(false);
 currentSidebarStatus = this.sidebar.asObservable();
 
 private pageTitle = new BehaviorSubject("");
 currentPageTitle = this.pageTitle.asObservable();
 
-  constructor(private http:HttpClient) {
-    this.mainRoute = baseTestingUrl;
+  constructor(private http:HttpClient, private loginService:LoginService) {
+    this.mainRoute = baseUrl;
   }
 
   showSideBar(status:boolean){
@@ -33,27 +36,70 @@ currentPageTitle = this.pageTitle.asObservable();
 
   getCounties():Observable<any>{
 
-    var url = this.mainRoute + '/getcounties';
+    var url = this.mainRoute + '/counties';
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({'Content-Type': 'application/json'})
+    }
 
-    return this.http.get(url, {responseType: 'json'});
+    return this.http.get(url, httpOptions);
   }
 
-  getAllUsers():Observable<Users>{
+  getAllUsers():Observable<any>{
 
-    var url = this.mainRoute + '/getall';
+    var url = this.mainRoute + '/listof';
 
-    return this.http.get<Users>(url, {responseType: 'json'});
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({'Content-Type': 'application/json'})
+    }
+
+    return this.http.get<any>(url, httpOptions);
   }
-  updateUser(id:string, data:Users):Observable<Users>{
-    var url = this.mainRoute + '/updade/' + id;
 
-    return this.http.put<Users>(url, data, {responseType: 'json'});
+
+
+  addUser(data:Users):Observable<any>{
+    var url = this.mainRoute + '/registration';
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({'Content-Type': 'application/json'})
+    }
+
+    return this.http.post<any>(url, data, httpOptions);
   }
 
-  addUser(data:Users):Observable<Users>{
-    var url = this.mainRoute + '/newuser';
 
-    return this.http.post<Users>(url, data);
+
+  updateUser(data:Users):Observable<any>{
+    var url = this.mainRoute + '/updade';
+
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'token': this.loginService.getToken()
+      })
+    }
+
+    return this.http.put<any>(url, data, httpOptions);
+  }
+
+  getCovidData():Observable<any>{
+    var url = this.mainRoute + '/data';
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'token': this.loginService.getToken()
+      })
+    }
+    return this.http.get<any>(url, httpOptions);
   }
 
 }

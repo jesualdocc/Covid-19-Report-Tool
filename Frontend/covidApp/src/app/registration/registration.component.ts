@@ -13,15 +13,26 @@ import { DataService } from '../services/data.service';
 export class RegistrationComponent implements OnInit {
 
   states = usStates;
+  counties:any;
   model = new Users();
   submitted = false;
   submissionMessage = '';
   emailList:string[] = [];
   usernameList:string[] = [];
   errorMessage = false;
+  checkMatch:string = "";
 
+  //Property that get checks in realtime
+  get passwordMatch():boolean{
+
+    return this.model.password == this.checkMatch ? true:false;
+
+  }
+
+  //Property that get checks in realtime
   get checkUsername():string {
     const uName = this.model.userName;
+
     if(this.usernameList.includes(uName)){
       const ret = 'Username:' + uName + ' is not available';
       return ret;
@@ -30,13 +41,13 @@ export class RegistrationComponent implements OnInit {
     return '';
    }
 
-
-
    constructor(private router: Router, private dataService:DataService) { }
 
 
   ngOnInit(): void {
-    //this.getAll();
+
+    this.getAll();
+
   }
 
   onSubmit(){
@@ -56,10 +67,14 @@ export class RegistrationComponent implements OnInit {
 
   getAll(){
     this.dataService.getAllUsers().subscribe(data=>{
-     var result = new Array(data);
-      for(var values of result){
-        this.emailList.push(values['email']);
-        this.usernameList.push(values['userName']);
+    var result = data['users']
+    var emails = result['email']
+    var usernames = result['userName']
+
+      for(var i in emails){
+
+      this.emailList.push(emails[i]);
+      this.usernameList.push(usernames[i]);
       }
 
     });}
@@ -71,18 +86,11 @@ export class RegistrationComponent implements OnInit {
       this.submitted = true;
       this.submissionMessage = '';
       alert("Registration Successful");
-      //this.dialogRef.close();
       this.router.navigate(['/login']);
     }
     else{
 
-      this.errorMessage = true;
-      if(this.emailList.includes(this.model.email)){
-        this.submissionMessage = "Email is already Registered";
-      }
-      else{
-        this.submissionMessage = "An error occurred!Try Again..."
-      }
+      this.submissionMessage = "An error occurred!Try Again...";
 
     }
     });

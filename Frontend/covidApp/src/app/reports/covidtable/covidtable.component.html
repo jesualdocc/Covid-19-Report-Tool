@@ -1,0 +1,53 @@
+
+
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+          <td mat-cell *matCellDef="let model"> {{model.date}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cases">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cases </th>
+            <td mat-cell *matCellDef="let model" > {{model.cases}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="deaths">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Deaths </th>
+            <td mat-cell *matCellDef="let model"> {{model.deaths}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="confirmedCases">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Confirmed Cases </th>
+            <td mat-cell *matCellDef="let model"> {{model.confirmedCases}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="confirmedDeaths">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Confirmed Deaths </th>
+            <td mat-cell *matCellDef="let model"> {{model.confirmedDeaths}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="probableCases">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Probable Cases </th>
+            <td mat-cell *matCellDef="let model"> {{model.probableCases}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="probableDeaths">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Probable Deaths </th>
+            <td mat-cell *matCellDef="let model"> {{model.probableDeaths}} </td>
+          </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <!-- (mouseover)="highlightRow(row)" [ngClass] = "{'highlight' : row.date == selectedName}"></tr> -->
+
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[7, 30, 60]" showFirstLastButtons></mat-paginator>
+    </div>
+

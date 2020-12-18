@@ -1,3 +1,4 @@
+import { DataService } from './../services/data.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -6,8 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./reports.component.css']
 })
 export class ReportsComponent implements OnInit {
+  title:string = "Reports";
 
-  constructor() { }
+  constructor(private dataService:DataService) {
+    this.dataService.changePageTitle(this.title);
+  }
 
   ngOnInit(): void {
   }

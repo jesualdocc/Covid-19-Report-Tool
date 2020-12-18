@@ -6,6 +6,7 @@ import { baseUrl, baseTestingUrl } from './../../environments/environment';
 import { Observable } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
 import { Router } from '@angular/router';
+import { Users } from '../registration/Users';
 
 @Injectable({
   providedIn: 'root'
@@ -13,40 +14,24 @@ import { Router } from '@angular/router';
 export class LoginService {
 token:string;
 isLoggedIn:boolean;
+headers:HttpHeaders;
+user:any;
 
   constructor(private http:HttpClient, private localStorage:LocalStorageService,
      private router:Router) {
   }
 
-  loginHandler(data:ILogin):Observable<ILogin>{
-    var requestToken = 'no';
-
-    if(this.token == null || this.token == "" || this.token == undefined){
-      requestToken = 'yes';
-    }
+  loginHandler(data:any):Observable<any>{
 
     var httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'tokenNeeded': requestToken
-      }),
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({'Content-Type': 'application/json'})
     }
-    return this.http.post<ILogin>( baseTestingUrl+'/login', data, httpOptions);
-  }
-
-  isTokenExpired():boolean{
-    return false;
+    return this.http.post<any>(baseUrl +'/login', data, httpOptions);
   }
 
   getToken():string{
-
-    if(this.isTokenExpired()){
-
-      this.deleteTokenData();
-      this.logout();
-
-      return "";
-    }
 
     this.token = this.localStorage.retrieve('token');
 
@@ -63,9 +48,13 @@ isLoggedIn:boolean;
     this.router.navigate(['/home']);
   }
 
+  isAuthenticated():boolean{
+    return this.isLoggedIn;
+  }
+
   deleteTokenData(){
     this.localStorage.clear('token');
-    this.localStorage.clear('tokenExpiration');
+
   }
 
 

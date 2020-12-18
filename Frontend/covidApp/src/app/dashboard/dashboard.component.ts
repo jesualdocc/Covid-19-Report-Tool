@@ -26,7 +26,6 @@ export class DashboardComponent implements OnInit {
     const chart1 = new LineGraph('chart1', [[1, 2, 3, 4, 5, 6, 7], [67, 38, 839, 4664, 988, 674, 123]]);
     this.lineGraph = chart1.getChart();
 
-
     const chart2 = new PieGraph('chart2', [100, 25]);
     this.pieGraph = chart2.getChart();
 

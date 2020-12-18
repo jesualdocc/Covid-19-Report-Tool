@@ -9,16 +9,20 @@ import { Router } from '@angular/router';
 export class SidebarComponent implements OnInit {
 
   selectedRoute:any;
+
+  //['icon name', 'Page Title']
   optionsList = [["dashboard","Dashboard"],["analytics","Reports"],["people","Twitter Feed"], ["settings","Account Settings"]];
 
 
-  constructor(private router: Router,) { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
   }
 
+  //Navigates to route based on selected value from mat-list and optionsList variable
   goTo(selection:any){
     var route;
+
     if(selection[1] == 'Dashboard'){
       route = '/dashboard';
     }
@@ -32,6 +36,7 @@ export class SidebarComponent implements OnInit {
       route = '/settings';
     }
 
-    this.router.navigate([route])
+    console.log(route);
+    this.router.navigate([route]);
   }
 }

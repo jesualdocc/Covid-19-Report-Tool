@@ -36,12 +36,10 @@ export class LoginComponent implements OnInit {
     if(this.formGroup?.valid){
       this.loginService.loginHandler(this.formGroup.value).subscribe(data=>{
 
-        var result = data['valid'] == undefined || data['valid'] == null ? false: true;
+        if(data.status == 201){
+          this.loginService.user = data['body'].user;
 
-        if(result){
-
-          this.localSt.store('token', data['data'].token);
-          this.localSt.store('tokenExpiration', data['data'].tokenExpiration);
+          this.localSt.store('token', data['body'].token);
 
           this.loginService.isLoggedIn = true;
           this.router.navigate(['/dashboard']);
