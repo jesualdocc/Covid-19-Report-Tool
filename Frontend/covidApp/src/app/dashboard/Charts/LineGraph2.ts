@@ -1,35 +1,29 @@
 import{Chart} from 'chart.js';
 
-export class BarGraph{
+export class LineGraph2{
 
   private id:string;
-  private data:number[][];
+  private data:number;
 
-  constructor(id:string,data:number[][]){
+  constructor(id:string,data:number){
       this.data = data;
       this.id = id;
       this.getChart();
   }
 
   getChart():Chart{
-    const title = "Total Cases vs Deaths (Last 7 Days)";
+    const title = "Total Deaths (Last 7 Days)";
     const chart =  new Chart(this.id, {
 
-      type:"bar",
+      type:"line",
       data:{
         labels:['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        datasets:[{
-          label:'Confirmed Cases',
-          backgroundColor: "blue",
-          borderColor:"green",
-          data:this.data[0],
-          fill:false
-        },
+        datasets:[
         {
           label:'Confirmed Deaths',
-          backgroundColor: "red",
-          borderColor:"green",
-          data:this.data[1],
+          backgroundColor: "green",
+          borderColor:"red",
+          data:this.data,
           fill:false
         }
 

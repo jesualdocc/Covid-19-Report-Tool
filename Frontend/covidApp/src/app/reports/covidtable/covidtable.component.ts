@@ -1,3 +1,4 @@
+import { LoginService } from 'src/app/login/login.service';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
@@ -5,12 +6,6 @@ import { MatSort } from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table/';
 import { DataService } from 'src/app/services/data.service';
 import {ICovidData} from '../CovidData';
-
-const cData:ICovidData[] = [
-  {date:Date.now(), cases:123, deaths:565, confirmedCases:785, confirmedDeaths:984, probableCases:53, probableDeaths:535, str:"Hello"},
-  {date:Date.now(), cases:134, deaths:85, confirmedCases:785, confirmedDeaths:984, probableCases:53, probableDeaths:535, str:"Teste"},
-  {date:Date.now(), cases:223, deaths:745, confirmedCases:785, confirmedDeaths:984, probableCases:53, probableDeaths:535, str:"Another"}
-];
 
 @Component({
   selector: 'app-covidtable',
@@ -20,21 +15,24 @@ const cData:ICovidData[] = [
 export class CovidtableComponent implements AfterViewInit {
 
 
-  displayedColumns: string[] = ['date','cases', 'deaths', 'confirmedCases', 'confirmedDeaths', 'probableCases', 'probableDeaths'];
+  displayedColumns: string[] = ['date','cases', 'deaths', 'confirmedCases', 'confirmedDeaths'];
   dataSource:MatTableDataSource<ICovidData>;
+  response:any;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort:MatSort;
 
   public selectedName:any;
 
-  constructor(){
-    this.dataSource = new MatTableDataSource<ICovidData>(cData);
+  constructor( private dataService:DataService, private loginService:LoginService){
+
+    this.requestData(60);
+
   }
 
+
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+
   }
 
   public highlightRow(model:any) {
@@ -50,6 +48,66 @@ export class CovidtableComponent implements AfterViewInit {
       this.dataSource.paginator.firstPage();
     }
   }
+
+  async requestData(days:number){
+    var user = this.loginService.user;
+    user['days'] = days;
+
+      var data =  await this.dataService.getCovidData(user).toPromise().then(res=> {
+        var data = res['body'].data;
+        return data;
+      });
+
+    var tableData = this.formatData(data);
+
+    this.dataSource = new MatTableDataSource<ICovidData>(tableData);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
+
+  formatData(data:any){
+
+    var arrData:ICovidData[] =[];
+     //Get key(dates) and values({cases, deaths...} )
+     Object.keys(data).forEach(function(key) {
+
+      var arr:ICovidData = {cases: 0, confirmedCases: 0,confirmedDeaths: 0,
+      date: "", deaths: 0, str:""};
+
+      var values = data[key];
+      values['date'] = key;
+
+      arr.cases = values['cases'];
+      arr.deaths = values['deaths'];
+      arr.confirmedCases = values['confirmed_cases'];
+      arr.confirmedDeaths = values['confirmed_deaths'];
+      arr.date = values['date'];
+
+      arrData.push(arr);
+
+  });
+
+  //Descending based on date
+    arrData.sort((a, b) => {
+      var x = new Date(a.date);
+      var y = new Date(b.date);
+
+      if(x > y){
+        return -1;
+      }
+
+      if (x < y){
+        return 1;
+      }
+
+      return 0;
+    });
+
+   return arrData;
+  }
+
+
 }
 
 

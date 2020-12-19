@@ -3,15 +3,16 @@ import{Chart} from 'chart.js';
 export class LineGraph{
 
   private id:string;
-  private data:number[][];
+  private data:number;
 
-  constructor(id:string,data:number[][]){
+  constructor(id:string,data:number){
       this.data = data;
       this.id = id;
+      this.getChart();
   }
 
   getChart():Chart{
-    const title = "Total Cases vs Deaths (Last 7 Days)";
+    const title = "Total Cases (Last 7 Days)";
     const chart =  new Chart(this.id, {
 
       type:"line",
@@ -21,14 +22,7 @@ export class LineGraph{
           label:'Confirmed Cases',
           backgroundColor: "green",
           borderColor:"blue",
-          data:this.data[0],
-          fill:false
-        },
-        {
-          label:'Confirmed Deaths',
-          backgroundColor: "green",
-          borderColor:"red",
-          data:this.data[1],
+          data:this.data,
           fill:false
         }
 

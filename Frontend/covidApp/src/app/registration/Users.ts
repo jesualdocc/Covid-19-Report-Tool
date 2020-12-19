@@ -7,4 +7,5 @@ export class Users{
   password:string;
   county:string;
   state:string;
+  days:number;
 }

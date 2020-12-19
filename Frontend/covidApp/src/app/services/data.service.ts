@@ -73,23 +73,21 @@ currentPageTitle = this.pageTitle.asObservable();
   }
 
 
-
   updateUser(data:Users):Observable<any>{
-    var url = this.mainRoute + '/updade';
+    var url = this.mainRoute + '/updadeinfo';
 
     var httpOptions = {
       observe : 'response' as const,
       responseType:'json' as const,
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'token': this.loginService.getToken()
+        'Content-Type': 'application/json'
       })
     }
 
     return this.http.put<any>(url, data, httpOptions);
   }
 
-  getCovidData():Observable<any>{
+  getCovidData(data:Users):Observable<any>{
     var url = this.mainRoute + '/data';
     var httpOptions = {
       observe : 'response' as const,
@@ -99,7 +97,7 @@ currentPageTitle = this.pageTitle.asObservable();
         'token': this.loginService.getToken()
       })
     }
-    return this.http.get<any>(url, httpOptions);
+    return this.http.post<any>(url, data, httpOptions);
   }
 
 }

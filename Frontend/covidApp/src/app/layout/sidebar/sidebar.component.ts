@@ -36,7 +36,6 @@ export class SidebarComponent implements OnInit {
       route = '/settings';
     }
 
-    console.log(route);
     this.router.navigate([route]);
   }
 }

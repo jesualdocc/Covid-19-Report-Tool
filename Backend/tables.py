@@ -1,3 +1,5 @@
+
+
 #Takes a user returned from the database in tuple form and returns it as dictionary
 
 def convert_user_tuple_to_dict(user:tuple):
@@ -24,3 +26,6 @@ def convert_email_username_tuple_to_dict(user:tuple):
     dictionary['userName'] = usernames    
     
     return dictionary
+
+
+    

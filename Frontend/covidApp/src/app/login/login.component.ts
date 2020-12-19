@@ -42,14 +42,24 @@ export class LoginComponent implements OnInit {
           this.localSt.store('token', data['body'].token);
 
           this.loginService.isLoggedIn = true;
+          this.submissionMessage = '';
           this.router.navigate(['/dashboard']);
 
+        }
+
+      }, err=> {
+
+        if(err.status == 401){
+          this.submissionMessage = "Username or Password is incorrect";
         }
         else{
           this.submissionMessage = "An error occurred!Try Again...";
           this.loginService.logout();
         }
-      });
+
+      }
+
+        );
     }
   }
 

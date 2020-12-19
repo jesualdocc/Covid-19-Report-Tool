@@ -5,8 +5,6 @@ export interface ICovidData{
   deaths:number;
   confirmedDeaths:number;
   confirmedCases:number;
-  probableCases:number;
-  probableDeaths:number;
   str:string;
 }
 

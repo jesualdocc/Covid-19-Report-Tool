@@ -8,6 +8,7 @@ export class PieGraph{
   constructor(id:string,data:number[]){
     this.data = data;
     this.id = id;
+    this.getChart();
   }
 
   getChart():Chart{

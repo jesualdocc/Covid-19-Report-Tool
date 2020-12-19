@@ -14,7 +14,7 @@ import { usStates } from '../services/States';
 export class ProfileinformationComponent implements OnInit {
 
   states = usStates;
-  counties = ["County1", "County 2"];
+  counties = [];
   model = new Users();
   submitted = false;
   submissionMessage = '';
@@ -24,7 +24,26 @@ export class ProfileinformationComponent implements OnInit {
 
   ngOnInit(): void {
     this.getUser();
+    this.getCounties();
 
+  }
+
+  getCounties(){
+    this.dataService.getCounties().subscribe(data=>{
+      if(data.status == 200){
+
+        var result = data['body'].data
+        for(var i of result){
+
+          if(!this.counties.includes(i[2]))
+            this.counties.push(i[2])
+        }
+
+        this.counties.sort()
+      }
+
+
+    })
   }
 
   getUser(){
@@ -41,15 +60,15 @@ export class ProfileinformationComponent implements OnInit {
   }
 
   onSubmit(){
-
-    //this.sendData();
+    console.log('Reached')
+    this.sendData();
 
 
   }
 
   sendData(){
     this.dataService.updateUser(this.model).subscribe(result=>{
-      if(result['ok'] == 1){
+      if(result.status == 201){
         this.errorMessage = false;
         this.submitted = true;
         this.submissionMessage = '';
@@ -57,12 +76,13 @@ export class ProfileinformationComponent implements OnInit {
 
         this.router.navigate(['/dashboard']);
       }
-      else{
+
+   },
+   err=>{
         this.errorMessage = true;
         this.submissionMessage = "An error occurred!Try Again...";
-
-      }
-   });
+   }
+   );
   }
 
 }

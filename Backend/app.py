@@ -9,7 +9,6 @@ import jwt
 from datetime import datetime, timedelta 
 from functools import wraps 
 from tables import convert_user_tuple_to_dict, convert_email_username_tuple_to_dict
-import asyncio
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -64,6 +63,9 @@ def login():
         }, app.config['SECRET_KEY']) 
 
             return make_response(jsonify({'token' : token.decode('UTF-8'), 'user':user_dict}), 201)
+       
+        else:
+            return jsonify({'message': 'Username or Password is incorrect'}), 401
 
     return make_response(jsonify({'message':'Invalid paramentes'}), 400)
 
@@ -93,7 +95,7 @@ def registration():
 
 
 #Returns actual county data by days 
-@app.route('/data',methods = ['GET'])
+@app.route('/data',methods = ['POST'])
 def data():
     global sql
     
@@ -105,32 +107,50 @@ def data():
         data = None
 
         if fips is None:
-            return jsonify({"ERROR":"COUNTY AND STATE MISMATCH",'request':result}), 204 #No Content
+            return jsonify({"ERROR":"COUNTY AND STATE MISMATCH",'request':{}}), 204 #No Content
 
-        if 'days' in request.json and request.json['days'].isdigit():
-            data = sql.get_county_info(fips,request.json['days'])
+        if 'days' in request.json:
+            days = None
+            try:
+                #Make sure days in int
+                days = int(request.json['days'])
+            except:
+                return make_response(jsonify({}), 400)
+
+            data = sql.get_county_info(fips, days)
         else:
             data = sql.get_county_info(fips)
-
+        
         return make_response(jsonify({"fips":fips,'data':data}), 200)
     
     else:
         return make_response(jsonify({}), 400)
    
-   
+
 #Returns list of counties
 @app.route('/counties', methods=['GET'])
 def get_counties():
     global sql
    
     try:
-        
         counties = sql.get_counties()
         
         return make_response(jsonify({'data':counties}), 200)
     except:
         return make_response(jsonify({'request':{}}), 500)
 
+#updates user info
+@app.route('/updateinfo', methods=['PUT'])
+def update_user_info():
+    global sql
+    result = request.json
+    try:
+        sql.update_user(result)
+
+        return make_response(jsonify({'message': 'Succesfull'}), 201)
+    except:
+        
+        return make_response(jsonify({'request':result}), 400)
    
 #Returns predictions of cases/deaths by county
 @app.route('/predictions', methods = ['GET'])
