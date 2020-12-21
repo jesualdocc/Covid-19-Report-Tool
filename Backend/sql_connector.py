@@ -1,3 +1,4 @@
+from datetime import datetime
 import mysql.connector
 import pandas as pd
 import requests
@@ -5,6 +6,8 @@ import filecmp
 import logging
 import os
 import time
+from config import Config
+import csv
 
 from git import Repo, Commit
 
@@ -50,7 +53,7 @@ class SQLConnector(object):
 
         self.cursor.execute(sql)
 
-    def set_initial_data(self, username):
+    def set_initial_data(self):
         '''
             Function to setup the schema for the database
         '''
@@ -62,10 +65,12 @@ class SQLConnector(object):
         self.create_county_table("counties",county_info)
         self.create_user_table()
         stat_columns.append(('time','DATETIME'))
-        print(len(stat_columns))
-        print("STAT_COLUMNS: ", stat_columns)
+        
         for fips in df["fips"]:
             self.create_stat_table(fips,stat_columns,force_drop = True)
+        
+        print('-'*20); print('DONE');print('-'*20)
+
 
     def find_users(self, username=None):
         #Function to retrieve users from db (all and by id)
@@ -112,7 +117,6 @@ class SQLConnector(object):
             return False
 
 
-
     def insert_new_data(self):
         print("*********** INSERTING THE LATEST DATA *************************")
         df = pd.read_csv("current_data.csv")
@@ -126,18 +130,18 @@ class SQLConnector(object):
         stat_str = ",".join(stat_columns)
         stat_str = "(" + stat_str + ")"
         stat_str = stat_str.replace('date','time')
-        print(stat_columns)
-        print(stat_df.head())
-
+        
         for index, row in df.iterrows():
             values = row[stat_columns].values.tolist()
             values = [str(x) for x in values]
             value_str = ",".join(values)
             value_str = value_str.replace("nan","0")
+
             sql = "INSERT INTO "+ row["fips"] + " " + stat_str + " VALUES (" + value_str + ")"
-            #print(sql)
+
             self.cursor.execute(sql)
             self.db.commit()
+
 
     def fetch_online_data(self,commit = None):
         if commit is None:
@@ -166,7 +170,7 @@ class SQLConnector(object):
         if not fetched:
             print("FAILED TO GET DATA")
             return
-
+        #Current - data already in the data base
         current_data = os.path.join(os.getcwd(),"current_data.csv")
         if os.path.exists(current_data) and filecmp.cmp("current_data.csv","latest.csv",False):
             print("DATA ALREADY EXISTS")
@@ -187,6 +191,27 @@ class SQLConnector(object):
         result  = self.cursor.fetchall()
         return result
 
+    def get_all_data_per_county(self, county:str, state:str):
+        fips = self.get_fips(state, county)
+        query = "SELECT id ,cases, deaths FROM " + fips +";"
+        self.cursor.execute(query)
+        tmp = self.cursor.fetchall()
+        result = []
+        
+        for res in tmp:
+            result.append(list(res))
+        
+        return result
+
+    def get_total_per_county(self, county:str, state:str):
+        fips = self.get_fips(state, county)
+        query = "SELECT count(*) FROM " + fips +";"
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        
+        return result
+        
+
     def get_county_info(self,fips,days = None):
         '''
         Function to get info per county: fips = fips_8055
@@ -203,17 +228,25 @@ class SQLConnector(object):
             refined_result[res[-1].strftime("%d-%b-%Y")] = {"cases":res[1],"deaths":res[2],"confirmed_cases":res[3],"confirmed_deaths":res[4]}
         return refined_result
 
-    def get_fips(self,state,county):
-        query = "SELECT fips FROM counties WHERE state='" + str(state) +"' AND county='" + str(county) + "';"
-        print("QUERY: " + query)
+    def get_all_state_county(self):
+        query = "SELECT county, state FROM counties;"
         self.cursor.execute(query)
         result = self.cursor.fetchall()
-        print(result)
+        if len(result) == 0:
+            return None
+        else:
+            return result
+
+
+    def get_fips(self,state,county):
+        query = "SELECT fips FROM counties WHERE state='" + str(state) +"' AND county='" + str(county) + "';"
+        self.cursor.execute(query)
+        result = self.cursor.fetchall()
         if len(result) == 0:
             return None
         else:
             return result[0][0]
-        return result
+        
 
     def get_commits(self):
         git_repo = os.path.join(os.getcwd(),'tmp')
@@ -222,33 +255,26 @@ class SQLConnector(object):
         else:
             repo = Repo(git_repo)
 
-        temp_commits = list(repo.iter_commits('master', max_count=200))
+        temp_commits = list(repo.iter_commits('master', max_count=300))
 
         commits = [(commit.hexsha,time.strftime("%a, %d %b %Y %H:%M", time.gmtime(commit.committed_date))) for commit in temp_commits]
 
         return commits
 
+    
     def insert_history_data(self):
         commits = self.get_commits()
         i = len(commits) - 1
+        
         while i > 0:
             commit = commits[i]
-            print(commit)
             self.update_db(commit[0])
             i = i - 1
 
-
 if __name__=="__main__":
-    pass
-    sql = SQLConnector("localhost","root","Jesualdo2020","coviddb")
-    #sql.create_user_table()
-    
-   
-    #sql.insert_history_data()
-   
-    #sql.update_db()
-    #sql.insert_new_data()
+    sql = SQLConnector(Config.sql_server,Config.sql_user,Config.sql_password,Config.sql_db)
     #sql.set_initial_data()
-    
-    #sql.get_initial_data()
-    
+    sql.insert_history_data()
+   
+
+    pass

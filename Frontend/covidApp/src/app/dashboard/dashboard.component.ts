@@ -4,7 +4,6 @@ import { PieGraph } from './Charts/PieGraph';
 import { LineGraph } from './Charts/LineGraph';
 import {BarGraph} from './Charts/BarGraph';
 import { Component, OnInit } from '@angular/core';
-import{Chart} from 'chart.js';
 import { DataService } from '../services/data.service';
 
 @Component({
@@ -69,6 +68,7 @@ export class DashboardComponent implements OnInit {
     //Today's data not available yet
     if( value == undefined || value == null )
     {
+      //Sunday = 0  go to sat = 6
       if(weekday == 0){
         weekday = 6;
       }
@@ -78,7 +78,7 @@ export class DashboardComponent implements OnInit {
       value = arrData[weekday];//day before
     }
 
-    return value; 
+    return value;
   }
 
   //Seven days

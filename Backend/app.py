@@ -9,12 +9,15 @@ import jwt
 from datetime import datetime, timedelta 
 from functools import wraps 
 from tables import convert_user_tuple_to_dict, convert_email_username_tuple_to_dict
+from predictor import Covid_Predictor
+import schedule
 
 app = Flask(__name__)
 app.config.from_object(Config)
 sql = SQLConnector(Config.sql_server,Config.sql_user,Config.sql_password,Config.sql_db)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 # decorator for verifying the JWT 
 def token_required(f): 
@@ -153,12 +156,45 @@ def update_user_info():
         return make_response(jsonify({'request':result}), 400)
    
 #Returns predictions of cases/deaths by county
-@app.route('/predictions', methods = ['GET'])
+@app.route('/predictions', methods = ['POST'])
 def get_predictions():
-    return ''
+    global sql
 
+    if 'county' in request.json and 'state' in request.json:
+        county = request.json['county']
+        state = request.json['state']
+        covid_predictor = Covid_Predictor(sql, county, state, 7)
+        result = covid_predictor.predict(10)
 
+        return make_response(jsonify({'cases':result[0], 'deaths':result[1]}), 200)
 
+    else:
+        return make_response(jsonify({}), 400)
+
+def perform_model_training():
+    #Function to perform training for each county
+    global sql
+    result = sql.get_all_state_county()
+    
+    for res in result:
+        
+        #(sql, county, state, poly degree)
+        covid_predictor = Covid_Predictor(sql, res[0], res[1], 7)
+        covid_predictor.train_models()
+               
+def get_latest_data():
+    global sql
+    sql.update_db() #Latest data
+    
 
 if __name__=="__main__":
-   app.run()
+    
+    #Perform training and daily data update every day once a day at 12AM
+    schedule.every().day.at("00:00").do(get_latest_data)
+    schedule.every().day.at("00:01").do(perform_model_training)
+    
+
+    #Starts Flask application
+    #app.run() 
+
+    
