@@ -11,12 +11,21 @@ from functools import wraps
 from tables import convert_user_tuple_to_dict, convert_email_username_tuple_to_dict
 from predictor import Covid_Predictor
 import schedule
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
+#Application Configuration
 app = Flask(__name__)
 app.config.from_object(Config)
 sql = SQLConnector(Config.sql_server,Config.sql_user,Config.sql_password,Config.sql_db)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 
 # decorator for verifying the JWT 
@@ -47,6 +56,7 @@ def token_required(f):
 
 #Authenticates user: return user data and jwt token
 @app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
 def login():
     global sql
    
@@ -74,6 +84,7 @@ def login():
 
 #Retrieves list of email and usernames already registered
 @app.route('/listof', methods=['GET'])
+@limiter.limit("5 per minute")
 def list_of_email_username():
     global sql 
     users = sql.find_users()
@@ -83,6 +94,7 @@ def list_of_email_username():
         
 #Registers a new user
 @app.route('/registration', methods=['POST'])
+@limiter.limit("2 per minute")
 def registration():
     global sql
     result = request.json
@@ -99,6 +111,7 @@ def registration():
 
 #Returns actual county data by days 
 @app.route('/data',methods = ['POST'])
+@token_required 
 def data():
     global sql
     
@@ -143,6 +156,7 @@ def get_counties():
         return make_response(jsonify({'request':{}}), 500)
 
 @app.route('/profileinfo', methods=['PUT'])
+@token_required 
 def profile_info():
     global sql
     result = request.json
@@ -155,19 +169,6 @@ def profile_info():
         return make_response(jsonify({'request':result}), 400)
     
 
-#
-@app.route('/updateinfo', methods=['PUT'])
-def update_user_info():
-    global sql
-    result = request.json
-    try:
-        sql.update_user(result)
-
-        return make_response(jsonify({'message': 'Succesfull'}), 201)
-    except:
-        
-        return make_response(jsonify({'request':result}), 400)
-   
 #Returns predictions of cases/deaths by county
 @app.route('/predictions', methods = ['POST'])
 def get_predictions():
