@@ -74,16 +74,16 @@ currentPageTitle = this.pageTitle.asObservable();
 
 
   updateUser(data:Users):Observable<any>{
-    var url = this.mainRoute + '/updadeinfo';
+    var url = this.mainRoute + '/profileinfo';
 
     var httpOptions = {
       observe : 'response' as const,
       responseType:'json' as const,
       headers: new HttpHeaders({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'token': this.loginService.getToken()
       })
     }
-
     return this.http.put<any>(url, data, httpOptions);
   }
 
@@ -98,6 +98,23 @@ currentPageTitle = this.pageTitle.asObservable();
       })
     }
     return this.http.post<any>(url, data, httpOptions);
+  }
+
+  getPredictions():Observable<any>{
+    var url = this.mainRoute + '/predictions';
+
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'token': this.loginService.getToken()
+      })
+    }
+
+    var user = this.loginService.user;
+
+    return this.http.post<any>(url, user, httpOptions)
   }
 
 }

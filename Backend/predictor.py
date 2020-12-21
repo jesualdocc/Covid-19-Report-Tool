@@ -77,13 +77,16 @@ class Covid_Predictor(object):
 
       prediction_c = []
       prediction_d = []
-      
+     
       #Predict the next {days} days
       for i in range(1, days+1):
-        tmp1 = model_cases.predict(poly_features.fit_transform([[total_count + i]]))
+
+        days_to_predict = int(total_count[0] + i)
+
+        tmp1 = model_cases.predict(poly_features.fit_transform([[days_to_predict]]))
         prediction_c.append(int(tmp1))
 
-        tmp2 = model_deaths.predict(poly_features.fit_transform([[total_count + i]]))
+        tmp2 = model_deaths.predict(poly_features.fit_transform([[days_to_predict]]))
         prediction_d.append(int(tmp2))
 
       

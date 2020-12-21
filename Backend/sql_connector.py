@@ -102,12 +102,12 @@ class SQLConnector(object):
 
     def update_user(self, user:dict):
         #Function to updater user info
-        query = f"UPDATE `users` SET 'firstName' ='{user['firstName']}', 'lastName' = '{user['lastName']}'', `email`='{user['email']}',"
-        queryCont = f" `userName`= '{user['userName']}', `password`='{user['password']}', `county`='{user['county']}', `state` ='{user['state']}' "
-        condition = f"WHERE 'id'='{user['id']}'"
+        query = f"UPDATE users SET firstName='{user['firstName']}', lastName= '{user['lastName']}', email='{user['email']}',"
+        queryCont = f" userName= '{user['userName']}', password='{user['password']}', county='{user['county']}', state ='{user['state']}' "
+        condition = f"WHERE id={user['id']};"
 
         full_query = query + queryCont + condition
-        print(full_query)
+        
         try:
             self.cursor.execute(full_query)
             self.db.commit()
@@ -216,7 +216,6 @@ class SQLConnector(object):
         '''
         Function to get info per county: fips = fips_8055
         '''
-        print("FIPS: ", fips, " DAYS: ", days)
         if days is None:
             self.cursor.execute("SELECT * FROM " + fips)
         else:
@@ -225,7 +224,7 @@ class SQLConnector(object):
         
         refined_result = {}
         for res in result:
-            refined_result[res[-1].strftime("%d-%b-%Y")] = {"cases":res[1],"deaths":res[2],"confirmed_cases":res[3],"confirmed_deaths":res[4]}
+            refined_result[res[-1].strftime("%m/%d/%Y")] = {"cases":res[1],"deaths":res[2],"confirmed_cases":res[3],"confirmed_deaths":res[4]}
         return refined_result
 
     def get_all_state_county(self):
@@ -274,7 +273,7 @@ class SQLConnector(object):
 if __name__=="__main__":
     sql = SQLConnector(Config.sql_server,Config.sql_user,Config.sql_password,Config.sql_db)
     #sql.set_initial_data()
-    sql.insert_history_data()
+    #sql.insert_history_data()
    
 
     pass

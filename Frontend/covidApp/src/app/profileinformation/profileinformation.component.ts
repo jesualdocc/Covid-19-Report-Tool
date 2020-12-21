@@ -60,21 +60,22 @@ export class ProfileinformationComponent implements OnInit {
   }
 
   onSubmit(){
-    console.log('Reached')
+
     this.sendData();
 
 
   }
 
   sendData(){
+
     this.dataService.updateUser(this.model).subscribe(result=>{
       if(result.status == 201){
         this.errorMessage = false;
         this.submitted = true;
         this.submissionMessage = '';
-        alert("User Updated");
 
-        this.router.navigate(['/dashboard']);
+        this.loginService.logout();
+        alert("User Info Updated")
       }
 
    },

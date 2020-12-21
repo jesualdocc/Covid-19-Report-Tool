@@ -8,6 +8,10 @@
 
 
     <span class="buttonspacer"></span>
+    <div *ngIf="isLoggedin" style="font-size: small;">
+      {{userInfo}}
+    </div>
+
     <button *ngIf="!isLoggedin" mat-icon-button class="example-icon favorite-icon" (click)="login()"
     title="Login">
       <mat-icon>login</mat-icon>

@@ -142,7 +142,20 @@ def get_counties():
     except:
         return make_response(jsonify({'request':{}}), 500)
 
-#updates user info
+@app.route('/profileinfo', methods=['PUT'])
+def profile_info():
+    global sql
+    result = request.json
+    try:
+        sql.update_user(result)
+
+        return make_response(jsonify({'message': 'Succesfull'}), 201)
+    except:
+        
+        return make_response(jsonify({'request':result}), 400)
+    
+
+#
 @app.route('/updateinfo', methods=['PUT'])
 def update_user_info():
     global sql
@@ -159,14 +172,15 @@ def update_user_info():
 @app.route('/predictions', methods = ['POST'])
 def get_predictions():
     global sql
+    days = 20
 
     if 'county' in request.json and 'state' in request.json:
         county = request.json['county']
         state = request.json['state']
         covid_predictor = Covid_Predictor(sql, county, state, 7)
-        result = covid_predictor.predict(10)
+        result = covid_predictor.predict(days)
 
-        return make_response(jsonify({'cases':result[0], 'deaths':result[1]}), 200)
+        return make_response(jsonify({'cases':result[0], 'deaths':result[1], 'days':days}), 200)
 
     else:
         return make_response(jsonify({}), 400)
@@ -193,8 +207,7 @@ if __name__=="__main__":
     schedule.every().day.at("00:00").do(get_latest_data)
     schedule.every().day.at("00:01").do(perform_model_training)
     
-
     #Starts Flask application
-    #app.run() 
+    app.run() 
 
     
