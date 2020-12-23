@@ -10,8 +10,8 @@ lerna-debug.log*
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 #Backend Ignores (Python)
-Backend/trained_models/
-Backend/config.py
+Backend/trained_models
+Backend/.config.py
 
 # Runtime data
 pids
