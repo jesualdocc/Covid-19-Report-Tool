@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask import Flask
 from flask.helpers import make_response
 from flask_cors import CORS, cross_origin
-from config import Config
+from configuration.config import Config
 from sql_connector import SQLConnector
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
