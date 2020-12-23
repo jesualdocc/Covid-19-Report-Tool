@@ -11,3 +11,4 @@ class Config(object):
     sql_password = os.environ['DB_REMOTE_ROOT_PASS'] if 'DB_REMOTE_ROOT_PASS' in os.environ else 'Jesualdo2020'
     sql_db = os.environ['DB_NAME'] if 'DB_NAME' in os.environ else 'coviddb'
 
+#Testing git ignore
