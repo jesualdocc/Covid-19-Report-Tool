@@ -68,6 +68,9 @@ class SQLConnector(object):
         
         for fips in df["fips"]:
             self.create_stat_table(fips,stat_columns,force_drop = True)
+
+        
+        self.insert_history_data()
         
         print('-'*20); print('DONE');print('-'*20)
 
@@ -253,6 +256,8 @@ class SQLConnector(object):
             repo = Repo.clone_from('https://github.com/nytimes/covid-19-data.git', git_repo)
         else:
             repo = Repo(git_repo)
+            o = repo.remotes.origin
+            o.pull()
 
         temp_commits = list(repo.iter_commits('master', max_count=300))
 
@@ -272,8 +277,9 @@ class SQLConnector(object):
 
 if __name__=="__main__":
     sql = SQLConnector(Config.sql_server,Config.sql_user,Config.sql_password,Config.sql_db)
-    #sql.set_initial_data()
-    #sql.insert_history_data()
+    
+    sql.set_initial_data()
+    #sql.update_db()
    
 
     pass

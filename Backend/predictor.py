@@ -95,6 +95,3 @@ class Covid_Predictor(object):
 
       return predictions
                 
-
-
-

@@ -204,6 +204,7 @@ def get_latest_data():
 
 if __name__=="__main__":
     
+    
     #Perform training and daily data update every day once a day at 12AM
     schedule.every().day.at("00:00").do(get_latest_data)
     schedule.every().day.at("00:01").do(perform_model_training)
