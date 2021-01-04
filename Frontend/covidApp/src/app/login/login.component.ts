@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit {
 
   formGroup:FormGroup | undefined;
   submissionMessage: string;
+  loader:boolean = false;
 
   constructor(private loginService:LoginService, private router:Router, private localSt:LocalStorageService){
 
@@ -33,6 +34,8 @@ export class LoginComponent implements OnInit {
 
   loginProcess(){
 
+    this.loader = true; //show progress bar
+
     if(this.formGroup?.valid){
       this.loginService.loginHandler(this.formGroup.value).subscribe(data=>{
 
@@ -49,12 +52,16 @@ export class LoginComponent implements OnInit {
 
       }, err=> {
 
+        this.loader = false; //show progress bar
         if(err.status == 401){
           this.submissionMessage = "Username or Password is incorrect";
         }
+
+        else if(err.status == 429){
+          this.submissionMessage = "Error! Try again later";
+        }
         else{
-          this.submissionMessage = "An error occurred!Try Again...";
-          this.loginService.logout();
+          this.submissionMessage = "An error occurred! Try Again...";
         }
 
       }

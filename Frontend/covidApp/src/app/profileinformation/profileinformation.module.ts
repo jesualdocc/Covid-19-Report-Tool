@@ -21,13 +21,15 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '../app-routing.module';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 
 @NgModule({
   declarations: [],
   imports: [
-
+    CommonModule,
+    MatProgressSpinnerModule
   ]
 })
 export class ProfileinformationModule { }

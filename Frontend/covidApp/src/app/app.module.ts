@@ -23,8 +23,6 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatListModule} from '@angular/material/list';
-import { ReportsComponent } from './reports/reports.component';
-import { SettingsComponent } from './settings/settings.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { NgxWebstorageModule } from 'ngx-webstorage';
 import { HttpClientModule } from '@angular/common/http';
@@ -33,9 +31,8 @@ import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
-import { TestComponent } from './test/test.component';
 import { MatTableModule } from '@angular/material/table';
-
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -44,8 +41,7 @@ import { MatTableModule } from '@angular/material/table';
     FooterComponent,
     SidebarComponent,
     LoginComponent,
-    RegistrationComponent,
-    TestComponent
+    RegistrationComponent
   ],
   imports: [
     BrowserModule,
@@ -67,6 +63,7 @@ import { MatTableModule } from '@angular/material/table';
     MatSidenavModule,
     MatListModule,
     MatGridListModule,
+    MatProgressSpinnerModule,
     MatCardModule,
     MatFormFieldModule,
     MatSelectModule,

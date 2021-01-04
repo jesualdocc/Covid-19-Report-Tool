@@ -13,6 +13,7 @@ import { DataService } from '../services/data.service';
 })
 export class DashboardComponent implements OnInit {
 
+
   constructor(private dataService:DataService, private loginService:LoginService) {
     this.dataService.changePageTitle("Dashboard");
    }
@@ -39,9 +40,10 @@ export class DashboardComponent implements OnInit {
 
       const chart2 = new PieGraph('chart4', [casesConfirmed, deathsConfirmed]);
 
+
+
     },
     err=>{
-
 
     });
   }

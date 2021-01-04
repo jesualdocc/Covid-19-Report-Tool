@@ -18,6 +18,7 @@ export class CovidtableComponent implements AfterViewInit {
   displayedColumns: string[] = ['date','cases', 'deaths', 'confirmedCases', 'confirmedDeaths'];
   dataSource:MatTableDataSource<ICovidData>;
   response:any;
+  loading:boolean = false;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort:MatSort;
@@ -50,6 +51,7 @@ export class CovidtableComponent implements AfterViewInit {
   }
 
   async requestData(days:number){
+    this.loading = true;
     var user = this.loginService.user;
     user['days'] = days;
 
@@ -63,6 +65,7 @@ export class CovidtableComponent implements AfterViewInit {
     this.dataSource = new MatTableDataSource<ICovidData>(tableData);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.loading = false;
   }
 
 

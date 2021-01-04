@@ -13,25 +13,6 @@
           <form (ngSubmit)="onSubmit()" #userForm="ngForm">
 
             <div class="form-group">
-              <label for="currentPass">Current Password</label>
-              <input type="password" class="form-control" id="currentPass" required minlength="6"
-                [(ngModel)]="checkCurrentP" name="currentPass" #currentPass="ngModel" placeholder="Enter Current Password">
-
-              <div *ngIf="currentPass.invalid && currentPass.touched" class="alert alert-danger">
-
-                <div *ngIf="currentPass.errors.required">
-                  Password is required.
-                </div>
-
-                <div *ngIf="password.errors.minlength">
-                  Invalid Password: Minimum Length 6
-                </div>
-              </div>
-
-            </div>
-
-
-            <div class="form-group">
               <label for="password">New Password</label>
               <input type="password" class="form-control" id="password" required minlength="6"
                 [(ngModel)]="model.password" name="password" #password="ngModel" placeholder="Enter Password">
@@ -48,7 +29,6 @@
               </div>
 
             </div>
-
 
             <div class="form-group">
               <label for="confirmPassword">New Confirm Password</label>
@@ -77,17 +57,15 @@
 
             <div style="text-align: center;">
               <button type="submit" class="btn btn-success" [disabled]="!userForm.form.valid && !passwordMatch">Submit</button>
+              <span style="margin-left: 4em;"></span>
 
+              <button type="button" mat-raised-button class="btn btn-danger"
+              (click)="cancel()">Cancel</button>
             </div>
           </form>
         </div>
       </div>
     </mat-card>
-
-  </mat-tab>
-
-
-  <mat-tab label="Settings 3">
 
   </mat-tab>
 

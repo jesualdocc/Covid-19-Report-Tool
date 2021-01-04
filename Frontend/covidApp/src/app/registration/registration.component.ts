@@ -21,6 +21,8 @@ export class RegistrationComponent implements OnInit {
   usernameList:string[] = [];
   errorMessage = false;
   checkMatch:string = "";
+  loading:boolean = false;
+  countyListEnable = false;
 
   //Property that get checks in realtime
   get passwordMatch():boolean{
@@ -57,26 +59,25 @@ export class RegistrationComponent implements OnInit {
 
 
   ngOnInit(): void {
-
     this.getAll();
-    this.getCounties();
 
   }
 
-  getCounties(){
-    this.dataService.getCounties().subscribe(data=>{
+  getStateCounties(state:string){
+    this.loading = true;
+    this.counties = [];
+    this.dataService.getCounties({'state':state}).subscribe(data=>{
       if(data.status == 200){
 
         var result = data['body'].data
         for(var i of result){
-
-          if(!this.counties.includes(i[2]))
-            this.counties.push(i[2])
+          this.counties.push(i)
         }
 
         this.counties.sort()
+        this.loading = false;
+        this.countyListEnable = true;
       }
-
 
     })
   }
@@ -97,26 +98,33 @@ export class RegistrationComponent implements OnInit {
 
 
   getAll(){
-    this.dataService.getAllUsers().subscribe(data=>{
-      if(data.status == 200){
 
-        var result = data['body'].users;
-        var emails = result['email']
+    this.dataService.getAllUsers().toPromise().then(
+      data=>{
 
-        var usernames = result['userName']
+        if(data.status == 200){
+          var result = data['body'].users;
 
-          for(var i in emails){
+          var emails = result['email'];
 
-          this.emailList.push(emails[i]);
-          this.usernameList.push(usernames[i]);
-          }
+          var usernames = result['userName'];
+
+            for(var i in emails){
+
+            this.emailList.push(emails[i]);
+            this.usernameList.push(usernames[i]);
+            }
+        }
       }
+    ).catch(err=>
+      {
+      console.log(err)
+    });
 
-
-    });}
+  }
 
   sendData(){
-    console.log(this.model)
+
     this.dataService.addUser(this.model).subscribe(result=>{
     if(result.status == 201){
       this.errorMessage = false;

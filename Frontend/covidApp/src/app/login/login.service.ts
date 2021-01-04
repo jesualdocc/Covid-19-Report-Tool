@@ -25,8 +25,7 @@ user:any;
 
     var httpOptions = {
       observe : 'response' as const,
-      responseType:'json' as const,
-      headers: new HttpHeaders({'Content-Type': 'application/json'})
+      responseType:'json' as const
     }
     return this.http.post<any>(baseUrl +'/login', data, httpOptions);
   }

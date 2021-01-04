@@ -5,7 +5,7 @@ import { RegistrationComponent } from './registration/registration.component';
 import { LoginComponent } from './login/login.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { TestComponent } from './test/test.component';
+
 
 const routes: Routes = [
 {
@@ -19,9 +19,10 @@ const routes: Routes = [
   data: { showHeader:false, showSidebar:false}
 },
 {
-  path:'teste',
-  component:TestComponent,
-  data: { showHeader:false, showSidebar:false}
+  path:'twitter',
+  loadChildren:()=> import ('./twitter/twitter.module').then(m=>m.TwitterModule),
+  data: { showHeader:true, showSidebar:true},
+  canActivate:[RouteGuard]
 },
 {
   path:'home',

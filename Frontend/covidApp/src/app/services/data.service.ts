@@ -34,16 +34,34 @@ currentPageTitle = this.pageTitle.asObservable();
     this.pageTitle.next(title);
   }
 
-  getCounties():Observable<any>{
+  getTweets():Observable<any>{
+
+    var url = this.mainRoute + '/twitter';
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({
+        'token': this.loginService.getToken()
+      })
+    }
+
+    var user = this.loginService.user;
+
+    return this.http.post<any>(url, user, httpOptions)
+  }
+
+  getCounties(state:any):Observable<any>{
 
     var url = this.mainRoute + '/counties';
     var httpOptions = {
       observe : 'response' as const,
       responseType:'json' as const,
-      headers: new HttpHeaders({'Content-Type': 'application/json'})
+      headers: new HttpHeaders({
+        'Content-Type':'application/json'
+      })
     }
 
-    return this.http.get(url, httpOptions);
+    return this.http.post(url,state, httpOptions);
   }
 
   getAllUsers():Observable<any>{
@@ -53,7 +71,9 @@ currentPageTitle = this.pageTitle.asObservable();
     var httpOptions = {
       observe : 'response' as const,
       responseType:'json' as const,
-      headers: new HttpHeaders({'Content-Type': 'application/json'})
+      headers: new HttpHeaders({
+        'Content-Type':'application/json'
+      })
     }
 
     return this.http.get<any>(url, httpOptions);
@@ -66,21 +86,23 @@ currentPageTitle = this.pageTitle.asObservable();
     var httpOptions = {
       observe : 'response' as const,
       responseType:'json' as const,
-      headers: new HttpHeaders({'Content-Type': 'application/json'})
+      headers: new HttpHeaders({
+        'Content-Type':'application/json'
+      })
     }
 
     return this.http.post<any>(url, data, httpOptions);
   }
 
 
-  updateUser(data:Users):Observable<any>{
+  updateUser(data:Users, changeType:string):Observable<any>{
     var url = this.mainRoute + '/profileinfo';
 
     var httpOptions = {
       observe : 'response' as const,
       responseType:'json' as const,
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
+        'changeType':changeType,
         'token': this.loginService.getToken()
       })
     }
@@ -93,7 +115,7 @@ currentPageTitle = this.pageTitle.asObservable();
       observe : 'response' as const,
       responseType:'json' as const,
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
+        'Content-Type':'application/json',
         'token': this.loginService.getToken()
       })
     }
@@ -107,7 +129,6 @@ currentPageTitle = this.pageTitle.asObservable();
       observe : 'response' as const,
       responseType:'json' as const,
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
         'token': this.loginService.getToken()
       })
     }

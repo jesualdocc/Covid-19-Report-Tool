@@ -19,29 +19,38 @@ export class ProfileinformationComponent implements OnInit {
   submitted = false;
   submissionMessage = '';
   errorMessage = false;
+  loading:boolean = false;
+  countyListEnable = true;
 
   constructor(private dataService:DataService, private router:Router, private loginService:LoginService) { }
 
   ngOnInit(): void {
     this.getUser();
-    this.getCounties();
+    this.getStateCounties(this.model.state, 0)
 
   }
 
-  getCounties(){
-    this.dataService.getCounties().subscribe(data=>{
+  getStateCounties(state:string, change:number){
+    //0 - No change, 1- Change
+    this.loading = true;
+
+    if(change){
+      this.countyListEnable = false;
+      this.counties = []
+    }
+
+    this.dataService.getCounties({'state':state}).subscribe(data=>{
       if(data.status == 200){
 
         var result = data['body'].data
         for(var i of result){
-
-          if(!this.counties.includes(i[2]))
-            this.counties.push(i[2])
+          this.counties.push(i)
         }
 
         this.counties.sort()
+        this.loading = false;
+        this.countyListEnable = true;
       }
-
 
     })
   }
@@ -66,9 +75,13 @@ export class ProfileinformationComponent implements OnInit {
 
   }
 
+  cancel(){
+    this.router.navigate(['/dashboard']);
+  }
+
   sendData(){
 
-    this.dataService.updateUser(this.model).subscribe(result=>{
+    this.dataService.updateUser(this.model, 'profile').subscribe(result=>{
       if(result.status == 201){
         this.errorMessage = false;
         this.submitted = true;

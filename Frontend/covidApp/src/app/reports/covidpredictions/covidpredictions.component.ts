@@ -14,6 +14,7 @@ export class CovidpredictionsComponent {
 
   displayedColumns: string[] = ['date','cases','deaths'];
   dataSource:MatTableDataSource<ICovidData>;
+  loading:boolean =  false;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort:MatSort;
@@ -29,6 +30,7 @@ export class CovidpredictionsComponent {
   }
 
   async requestData(){
+    this.loading = true;
 
       var data =  await this.dataService.getPredictions().toPromise().then(res=> {
         var data = res['body'];
@@ -40,6 +42,7 @@ export class CovidpredictionsComponent {
     this.dataSource = new MatTableDataSource<ICovidData>(tableData);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.loading = false;
   }
 
   formatData(data:any):ICovidData[]{

@@ -6,9 +6,9 @@ export const environment = {
   production: false
 };
 
-export const baseUrl = 'http://localhost:5000';
+export const baseUrl = 'https://serverflask.azurewebsites.net';
 export const baseUrlAngular = 'http://localhost:4200';
-export const baseTestingUrl = 'https://demo6643488.mockable.io';
+export const baseTestingUrl = 'http://localhost:8000';
 
 /*
  * For easier debugging in development mode, you can import the following file

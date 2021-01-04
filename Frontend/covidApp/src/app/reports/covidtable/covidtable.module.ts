@@ -8,6 +8,8 @@ import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule, Routes } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 
 const routes: Routes = [
   { path: '', component: CovidtableComponent }
@@ -24,6 +26,7 @@ const routes: Routes = [
     MatSortModule,
     MatInputModule,
     FlexLayoutModule,
+    MatProgressSpinnerModule,
     RouterModule.forChild(routes)
   ],
   exports: [RouterModule]

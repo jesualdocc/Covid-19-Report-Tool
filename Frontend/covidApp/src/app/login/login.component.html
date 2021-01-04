@@ -12,7 +12,7 @@
 
           <mat-form-field>
               <mat-label fxLayoutAlign="center center">Password</mat-label>
-              <input matInput type="password" placeholder="Username" formControlName="password">
+              <input matInput type="password" placeholder="Password" formControlName="password">
             </mat-form-field>
 
             <button mat-raised-button class="btn btn-success" type="submit">Login</button>
@@ -23,7 +23,11 @@
 
 
             <mat-list>
+              <div *ngIf="loader">
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+              </div>
               <mat-divider></mat-divider>
+              <br>
             </mat-list>
             <br>
             <div class="verticalalign">

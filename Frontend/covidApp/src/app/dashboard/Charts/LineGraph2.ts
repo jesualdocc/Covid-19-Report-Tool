@@ -12,7 +12,7 @@ export class LineGraph2{
   }
 
   getChart():Chart{
-    const title = "Total Deaths (Last 7 Days)";
+    const title = "Total Deaths (Weekly Trend)";
     const chart =  new Chart(this.id, {
 
       type:"line",

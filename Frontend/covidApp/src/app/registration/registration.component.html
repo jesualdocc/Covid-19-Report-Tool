@@ -1,5 +1,10 @@
-<mat-card>
+<div  class="centerVH" *ngIf="loading">
+  <mat-spinner ></mat-spinner>
+</div>
 
+
+<div *ngIf="!loading">
+<mat-card>
   <mat-toolbar color="primary" fxLayoutAlign="center center">Registration</mat-toolbar>
   <br>
   <div class="container" style="width:50%">
@@ -111,8 +116,25 @@
         </div>
 
         <div class="form-group">
+          <label for="state">State</label>
+          <select class="form-control" id="role" required [(ngModel)]="model.state" name="state" #state="ngModel"
+            placeholder="Select State" (change)="getStateCounties(state.value)">
+            <option hidden value="" disabled selected>Select State </option>>
+            <option *ngFor="let state of states" [value]="state">{{state}}</option>
+          </select>
+
+          <div *ngIf="state.invalid && state.touched" class="alert alert-danger">
+
+            <div *ngIf="state.errors.required">
+              State is required.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-group">
           <label for="county">County</label>
-          <select class="form-control" id="county" required [(ngModel)]="model.county" name="county" #county="ngModel"
+          <select class="form-control" id="county" [disabled]= "!countyListEnable" required [(ngModel)]="model.county" name="county" #county="ngModel"
             placeholder="d.ff">
             <option hidden value="" disabled selected>Select County </option>>
             <option *ngFor="let county of counties" [value]="county">{{county}}</option>
@@ -122,23 +144,6 @@
 
             <div *ngIf="county.errors.required">
               County is required.
-            </div>
-          </div>
-
-        </div>
-
-        <div class="form-group">
-          <label for="state">State</label>
-          <select class="form-control" id="role" required [(ngModel)]="model.state" name="state" #state="ngModel"
-            placeholder="Select State">
-            <option hidden value="" disabled selected>Select State </option>>
-            <option *ngFor="let state of states" [value]="state">{{state}}</option>
-          </select>
-
-          <div *ngIf="state.invalid && state.touched" class="alert alert-danger">
-
-            <div *ngIf="state.errors.required">
-              State is required.
             </div>
           </div>
 
@@ -167,6 +172,7 @@
     </div>
     <br>
     <br>
+  </div>
 
 
 

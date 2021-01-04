@@ -1,0 +1,32 @@
+
+<div class="centerVH" *ngIf="!allTweetsLoaded">
+    <mat-spinner ></mat-spinner>
+</div>
+
+
+<div class="color-primary" *ngIf="allTweetsLoaded">
+
+    <mat-grid-list cols="2" rowHeight="4:1">
+      <mat-grid-tile *ngFor="let tweets of tweetsList">
+
+        <mat-card class="cards">
+          <mat-card-header [ngClass]="{
+            'positive' : tweets['sentiment'] == 'positive',
+            'negative' : tweets['sentiment'] == 'negative',
+            'neutral': tweets['sentiment'] == 'neutral'}">
+
+            {{tweets['sentiment']}}
+
+          </mat-card-header>
+
+          <mat-card-content>
+            {{tweets['text']}}
+          </mat-card-content>
+
+
+        </mat-card>
+
+      </mat-grid-tile>
+    </mat-grid-list>
+
+</div>

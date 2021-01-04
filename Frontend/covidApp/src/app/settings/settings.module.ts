@@ -20,6 +20,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '../app-routing.module';
@@ -47,6 +49,7 @@ const routes: Routes = [
     MatGridListModule,
     MatCardModule,
     MatFormFieldModule,
+    MatProgressSpinnerModule,
     RouterModule.forChild(routes)
   ],
   exports: [RouterModule]

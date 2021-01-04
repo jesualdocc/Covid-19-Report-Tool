@@ -1,0 +1,40 @@
+version: "2"
+services:
+  db:
+    container_name: covid-database-mysql
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ***********
+      MYSQL_DATABASE: coviddb
+      MYSQL_USER: Jesualdo
+      MYSQL_PASSWORD: **************
+    volumes: 
+      - my-datavolume:/var/lib/mysql
+
+  myserver:
+    container_name: covid-server-flask
+    build: ./app
+    links: 
+      - "db:mydatabase"
+    ports:
+      - "8000:8000"
+
+  myfrontend:
+    container_name: covid-client-angular
+    build: ../Frontend/covidApp
+    links:
+      - "myserver:flask"
+    ports: 
+      - "4200:3000"
+
+volumes:
+  my-datavolume:
+
+  
+
+
+
+
+    

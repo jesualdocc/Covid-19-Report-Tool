@@ -9,6 +9,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import { CovidtableComponent } from './covidtable/covidtable.component';
 import { MatTableModule } from '@angular/material/table';
 import {  MatFormFieldModule } from '@angular/material/form-field';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 const routes: Routes = [
   { path: '', component: ReportsComponent }
@@ -22,6 +23,7 @@ const routes: Routes = [
     MatTableModule,
     MatFormFieldModule,
     MatPaginatorModule,
+    MatProgressSpinnerModule,
     MatSortModule,
     RouterModule.forChild(routes)
   ],
