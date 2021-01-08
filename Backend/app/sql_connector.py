@@ -424,9 +424,10 @@ class SQLConnector(object):
             print("")
 
             commit = commits[i]
-           
+            
             self.update_db(commit[0])
             i = i - 1
+            
 
             
     

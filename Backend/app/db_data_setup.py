@@ -37,8 +37,8 @@ class Initiate_Database():
     def set_initial_data_and_history(self):
         #Creates all tables, add list of counties, add historic data
         print('-'*40)
-        commits = self.get_commits(1350)
-        #print(commits[-1])
+        commits = self.get_commits(5) #1350
+        print(commits[-1])
         #return
         print('GETTING COMMITS')
         print('-'*40)

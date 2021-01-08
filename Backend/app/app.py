@@ -1,4 +1,5 @@
 import threading
+import time
 from flask import request, jsonify
 from flask import Flask
 from flask.helpers import make_response
@@ -321,22 +322,24 @@ def get_latest_data():
     global sql 
     sql.update_db() #Latest data
 
-def runSchedule():
+def run_schedule():
     while True:
         global stop_thread
         schedule.run_pending()
+        time.sleep(50)
+
         if stop_thread:
             break
 
 if __name__=="__main__":
     
-    #Perform training and daily data update every day once a day at 12AM
+    #Perform training and daily data update every day once a day
     schedule.every().day.at("00:00").do(get_latest_data)
-    schedule.every().day.at("00:10").do(perform_model_training)
+    schedule.every().day.at("00:30").do(perform_model_training)
 
     #Start a thread for running scheduling operations
     stop_thread = False
-    th_schedule = threading.Thread(target = runSchedule)
+    th_schedule = threading.Thread(target = run_schedule)
     th_schedule.start()
     
     #Starts Flask application for development
