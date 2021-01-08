@@ -22,7 +22,7 @@
       <mat-icon>power_settings_new</mat-icon>
     </button>
 
-    <button mat-icon-button class="example-icon" routerLink="settings" title="Settings" >
+    <button mat-icon-button *ngIf="isLoggedin" class="example-icon" routerLink="settings" title="Settings" >
       <mat-icon>settings</mat-icon>
     </button>
 

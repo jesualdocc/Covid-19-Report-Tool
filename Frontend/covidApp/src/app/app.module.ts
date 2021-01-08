@@ -1,3 +1,4 @@
+import { TableComponent } from './home/table/table.component';
 import { CovidtableComponent } from './reports/covidtable/covidtable.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -40,7 +41,9 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     HeaderComponent,
     FooterComponent,
     SidebarComponent,
+    HomeComponent,
     LoginComponent,
+    TableComponent,
     RegistrationComponent
   ],
   imports: [

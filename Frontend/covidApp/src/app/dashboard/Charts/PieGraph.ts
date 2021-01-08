@@ -12,7 +12,7 @@ export class PieGraph{
   }
 
   getChart():Chart{
-    const title = "Active/Recovered Cases vs Deaths";
+    const title = "Active/Recovered Cases vs Deaths (Last Record)";
 
     var casesMinusDeaths = this.data[0] - this.data[1];
 

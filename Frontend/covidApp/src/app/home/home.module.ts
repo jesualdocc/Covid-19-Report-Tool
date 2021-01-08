@@ -1,21 +1,11 @@
-import { HomeComponent } from './home.component';
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { RouterModule, Routes } from '@angular/router';
-
-const routes: Routes = [
-  { path: '', component: HomeComponent }
-];
-
+import { NgModule } from '@angular/core';
+import { TableComponent } from './table/table.component';
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [TableComponent],
   imports: [
-    CommonModule,
-    MatSidenavModule,
-    RouterModule.forChild(routes)
-  ],
-  exports: [RouterModule]
+    CommonModule
+  ]
 })
 export class HomeModule { }

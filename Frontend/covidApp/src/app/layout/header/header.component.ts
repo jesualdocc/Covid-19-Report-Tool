@@ -43,7 +43,7 @@ export class HeaderComponent implements OnInit{
 
 
     //Check if it's homepage to hide/show sidemenu (doesnt show on homepage)
-    this.homePage = this.pageTitle == "Covid Report" ? true : false;
+    this.homePage = this.pageTitle == "Covid Reporting Tool" ? true : false;
 
   }
 

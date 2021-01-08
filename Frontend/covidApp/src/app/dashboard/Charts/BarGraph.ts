@@ -12,7 +12,7 @@ export class BarGraph{
   }
 
   getChart():Chart{
-    const title = "Total Cases vs Deaths (Weekly)";
+    const title = "Total Cases vs Deaths (Last Week) ";
     const chart =  new Chart(this.id, {
 
       type:"bar",

@@ -14,6 +14,7 @@ import { baseUrl, baseTestingUrl } from './../../environments/environment';
 //Service to share data between unrelated components
 export class DataService {
 
+location:any; //To share county and state for non-logged user
 mainRoute:string;
 private sidebar = new BehaviorSubject(false);
 currentSidebarStatus = this.sidebar.asObservable();

@@ -1,0 +1,13 @@
+/* .mat-card{
+  padding:0 !important;
+  background-color: primary !important;
+} */
+
+.centerVH {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 20px);
+}
+
+

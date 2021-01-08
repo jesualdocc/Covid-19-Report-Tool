@@ -5,13 +5,19 @@ import { RegistrationComponent } from './registration/registration.component';
 import { LoginComponent } from './login/login.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { HomeComponent } from './home/home.component';
 
 
 const routes: Routes = [
 {
   path: '',
-  redirectTo: '/home',
-  pathMatch: 'full'
+  pathMatch: 'full',
+  component:HomeComponent,
+  data: { showHeader:true, showSidebar:false}
+},
+{
+  path:'home',
+  redirectTo:''
 },
 {
   path:'login',
@@ -23,11 +29,6 @@ const routes: Routes = [
   loadChildren:()=> import ('./twitter/twitter.module').then(m=>m.TwitterModule),
   data: { showHeader:true, showSidebar:true},
   canActivate:[RouteGuard]
-},
-{
-  path:'home',
-  loadChildren:() => import('./home/home.module').then(m=> m.HomeModule),
-  data: { showHeader:true, showSidebar:false}
 },
 {
   path:'dashboard',

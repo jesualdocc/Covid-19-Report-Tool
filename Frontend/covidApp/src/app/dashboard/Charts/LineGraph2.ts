@@ -3,16 +3,17 @@ import{Chart} from 'chart.js';
 export class LineGraph2{
 
   private id:string;
-  private data:number;
+  private data:number[];
 
-  constructor(id:string,data:number){
+  constructor(id:string,data:number[]){
       this.data = data;
       this.id = id;
+
       this.getChart();
   }
 
   getChart():Chart{
-    const title = "Total Deaths (Weekly Trend)";
+    const title = "Total Deaths (Last Week Trend)";
     const chart =  new Chart(this.id, {
 
       type:"line",
