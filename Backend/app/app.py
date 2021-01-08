@@ -167,6 +167,7 @@ def registration():
 
 #Returns actual county data by days 
 @app.route('/data',methods = ['POST'])
+@csp_header(config_csp)
 def data():
     global sql 
     
@@ -343,7 +344,7 @@ if __name__=="__main__":
     th_schedule.start()
     
     #Starts Flask application for development
-    #app.run(host='0.0.0.0', port=8000) 
+    app.run(host='0.0.0.0', port=8000) 
     
     #Start application for production
     serve(app, host='0.0.0.0', port=8000)

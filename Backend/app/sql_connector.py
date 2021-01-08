@@ -111,8 +111,8 @@ class SQLConnector(object):
             lat = location['lat'] 
             lon = location['lng']
 
-            query = f"INSERT INTO counties (latitude, longitude) VALUES ({lat}, {lon}) "
-            condition = f"where (county='{c[0]}' and state='{c[1]}') ;"
+            query = f'INSERT INTO counties (latitude, longitude) VALUES ({lat}, {lon}) '
+            condition = f'where (county="{c[0]}" and state="{c[1]}") ;'
      
         
   
