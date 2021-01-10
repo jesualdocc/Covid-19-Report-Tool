@@ -11,7 +11,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 Documentation.docx
 #Backend Ignores (Python)
-Backend/app/trained_models/
+Backend/app/predictions_and_analysis/trained_models/
 Backend/app/tmp/
 config.py
 
