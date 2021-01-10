@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn import linear_model
-import mysql.connector
 
 
 class Covid_Predictor(object):
@@ -12,8 +11,8 @@ class Covid_Predictor(object):
         self.sql = sql_instance
         self.county = county
         self.state = state
-        self.degree_cases = 4
-        self.degree_deaths = 3
+        self.degree_cases = 3 #10
+        self.degree_deaths = 3 #6
 
 
     #Function to train and save model
@@ -47,6 +46,8 @@ class Covid_Predictor(object):
 
       model_deaths = linear_model.LinearRegression()
       model_deaths.fit(x_deaths, y_deaths)
+
+    
 
       #Save models by unique identifier fips
       fips = self.sql.get_fips(self.state, self.county)

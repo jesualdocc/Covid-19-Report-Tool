@@ -1,3 +1,10 @@
+#Adds higher lever package to path directory
+import sys, os
+dirname = os.path.dirname(__file__)
+app_package_dir = os.path.join(dirname, '..')
+sys.path.append(dirname)
+sys.path.append(app_package_dir)
+
 import mysql.connector
 import pandas as pd
 import requests

@@ -1,5 +1,10 @@
-import os
-import sys
+#Adds higher lever package to path directory
+import sys, os
+dirname = os.path.dirname(__file__)
+app_package_dir = os.path.join(dirname, '..')
+sys.path.append(dirname)
+sys.path.append(app_package_dir)
+
 import time
 from sql_connector import SQLConnector
 from git import Repo

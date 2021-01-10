@@ -1,4 +1,4 @@
-
+import os
 
 #Takes a user returned from the database in tuple form and returns it as dictionary
 
