@@ -47,8 +47,6 @@ class Covid_Predictor(object):
       model_deaths = linear_model.LinearRegression()
       model_deaths.fit(x_deaths, y_deaths)
 
-    
-
       #Save models by unique identifier fips
       fips = self.sql.get_fips(self.state, self.county)
       dirname = os.path.dirname(__file__)
