@@ -1,5 +1,6 @@
 #Adds higher lever package to path directory
 import sys, os
+import jsonschema
 dirname = os.path.dirname(__file__)
 app_package_dir = os.path.join(dirname, '..')
 sys.path.append(dirname)
@@ -13,6 +14,7 @@ from flask import request, jsonify
 import jwt
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from jsonschema import validate
 from helper_functions import convert_user_tuple_to_dict
 from config import Config
 from db.sql_connector import SQLConnector
@@ -26,12 +28,38 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"]
 )
 
+#Set up schema for validation
+users_schema = {
+    "type":"object",
+    "properties":{
+        "id":{"type":"integer"},
+        "firstName":{"type":"string"},
+        "lastName":{"type":"string"},
+        "email":{"type":"string", "format":"email"},
+        "userName":{"type":"string", "minLength":5},
+        "password":{"type":"string", "minLength":6},
+        "county":{"type":"string"},
+        "state":{"type":"string"}
+    },
+    "required":["username", "password"]
+}
+
+#################################################
+
 @users.route('/login', methods=['POST'])
 @limiter.limit("3 per minute")
 def login():
     global sql 
-   
-    if 'userName' in request.json and 'password' in request.json:
+    result = request.json
+
+    try:
+        #Validate data from client
+        validate(result, users_schema)
+
+    except jsonschema.ValidationError:
+        return make_response(jsonify({'message':'Invalid paramentes'}), 400)
+
+    if 'userName' in result and 'password' in result:
         
         user = sql.find_users(request.json['userName'])
        
@@ -59,8 +87,15 @@ def login():
 @limiter.limit("2 per minute")
 def registration():
     global sql
-
     result = request.json
+
+    try:
+        #Validate data from client
+        validate(result, users_schema)
+
+    except jsonschema.ValidationError:
+        return make_response(jsonify({'message':'Invalid paramentes'}), 400)
+
     try:
         password = result['password']
         result['password'] = generate_password_hash(password)
@@ -68,8 +103,8 @@ def registration():
         sql.add_user(result)
         
         return jsonify({'message': 'Succesfull'}), 201
-    except:
-        return jsonify({'request':result}), 400
+    except Exception as e:
+        return jsonify({'request':result}), 500
 
 ############################################################################
 #Update user info
@@ -77,8 +112,14 @@ def registration():
 @token_required 
 def profile_info():
     global sql
-
     result = request.json
+
+    try:
+        #Validate data from client
+        validate(result, users_schema)
+
+    except jsonschema.ValidationError:
+        return make_response(jsonify({'message':'Invalid paramentes'}), 400)
     
     if 'changeType' in request.headers:
         if request.headers['changeType'] == 'profile':

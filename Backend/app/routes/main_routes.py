@@ -1,5 +1,7 @@
 #Adds higher lever package to path directory
 import sys, os
+
+import jsonschema
 dirname = os.path.dirname(__file__)
 app_package_dir = os.path.join(dirname, '..')
 sys.path.append(dirname)
@@ -11,6 +13,7 @@ from flask import request, jsonify
 from flask_csp.csp import csp_header
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from jsonschema import validate
 from helper_functions import convert_email_username_tuple_to_dict
 from jwt_auth import token_required
 from predictions_and_analysis.twitter_textblob import Twitter_Textblob
@@ -39,6 +42,16 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"]
 )
 
+#Set up schema for validation
+data_schema = {
+    "type":"object",
+    "properties":{
+        "county":{"type":"string"},
+        "state":{"type":"string"},
+        "days":{"type":"integer"}
+    }
+}
+
 
 ###################################################################################
 
@@ -60,26 +73,27 @@ def list_of_email_username():
 @csp_header(config_csp)
 def data():
     global sql 
+    result = request.json
+
+    try:
+        #Validate data
+        validate(result, data_schema)
+    except jsonschema.ValidationError:
+        return make_response(jsonify({}), 400)
     
-    if 'county' in request.json and 'state' in request.json:
+    if 'county' in result and 'state' in result:
         
-        county = request.json['county']
-        state = request.json['state']
+        county = result['county']
+        state = result['state']
         fips = sql.get_fips(state,county)
         data = None
 
         if fips is None:
             return jsonify({"ERROR":"COUNTY AND STATE MISMATCH",'request':{}}), 204 #No Content
 
-        if 'days' in request.json:
-            days = None
-            try:
-                #Make sure days in int
-                days = int(request.json['days'])
-                
-            except:
-                return make_response(jsonify({}), 400)
-
+        if 'days' in result:
+            days = result['days']
+          
             data = sql.get_county_info(fips, days)
             
         else:
@@ -96,8 +110,13 @@ def data():
 @main.route('/counties', methods=['POST'])
 @csp_header(config_csp)
 def get_counties():
-    
     result = request.json
+
+    try:
+        #Validate data
+        validate(result, data_schema)
+    except jsonschema.ValidationError:
+        return make_response(jsonify({}), 400)
 
     if 'state' in result:
         counties = sql.get_counties(result['state'])
@@ -121,10 +140,17 @@ def get_counties():
 def twitter_feed():
     global sql 
     tw = Twitter_Textblob()
+    result = request.json
+    
+    try:
+        #Validate data
+        validate(result, data_schema)
+    except jsonschema.ValidationError:
+        return make_response(jsonify({}), 400)
 
-    if 'county' in request.json and 'state' in request.json:
-        county = request.json['county']
-        state = request.json['state']
+    if 'county' in result and 'state' in result:
+        county = result['county']
+        state = result['state']
 
         #Todo - get geolocation from google maps data to filter tweets
         #Not many tweets geocoded
@@ -146,15 +172,16 @@ def twitter_feed():
 @csp_header(config_csp)
 def get_predictions():
     global sql 
+    result = request.json
     days = 20
 
-    if 'county' in request.json and 'state' in request.json:
-        county = request.json['county']
-        state = request.json['state']
+    if 'county' in result and 'state' in result:
+        county = result['county']
+        state = result['state']
         covid_predictor = Covid_Predictor(sql, county, state)
-        result = covid_predictor.predict(days)
+        predictions = covid_predictor.predict(days)
 
-        return make_response(jsonify({'cases':result[0], 'deaths':result[1], 'days':days}), 200)
+        return make_response(jsonify({'cases':predictions[0], 'deaths':predictions[1], 'days':days}), 200)
 
     else:
         return make_response(jsonify({}), 400)
