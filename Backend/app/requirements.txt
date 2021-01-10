@@ -19,3 +19,4 @@ mysql
 waitress
 flask-csp
 mysql-connector
+jsonschema
