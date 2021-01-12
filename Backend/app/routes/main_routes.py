@@ -14,14 +14,13 @@ from flask_csp.csp import csp_header
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from jsonschema import validate
-from helper_functions import convert_email_username_tuple_to_dict
 from jwt_auth import token_required
 from predictions_and_analysis.twitter_textblob import Twitter_Textblob
-from db.sql_connector import SQLConnector
+from db.sql_connector import DBManagement
 from predictions_and_analysis.predictor import Covid_Predictor
 
-main = Blueprint('main', __name__)
-sql = SQLConnector()
+main_bp = Blueprint('main_bp', __name__)
+sql = DBManagement()
 
 #Configuring Blueprint/Routes
 config_csp = {
@@ -56,20 +55,34 @@ data_schema = {
 ###################################################################################
 
 #Retrieves list of email and usernames already registered
-@main.route('/listof', methods=['GET'])
+@main_bp.route('/listof', methods=['GET'])
 @limiter.limit("5 per minute")
 @csp_header(config_csp)
 def list_of_email_username():
     global sql 
 
-    users = sql.find_users()
-    users_dict = convert_email_username_tuple_to_dict(users)
-    return make_response(jsonify({'users':users_dict}), 200)
+    try:
+        users = sql.find_users()
+        users_dict = {}
+        emails = []
+        usernames = []
+        for i in range(len(users)):
+            
+            emails.append(users[i][0]) 
+            usernames.append(users[i][1])
+
+        users_dict['email'] = emails
+        users_dict['userName'] = usernames 
+
+        return make_response(jsonify({'users':users_dict}), 200)
+    
+    except:
+        return make_response(jsonify({'request':{}}), 500)
 
 ##############################################################################################
 
 #Returns actual county data by days 
-@main.route('/data',methods = ['POST'])
+@main_bp.route('/data',methods = ['POST'])
 @csp_header(config_csp)
 def data():
     global sql 
@@ -107,7 +120,7 @@ def data():
 #################################################################################
 
 #Returns list of counties
-@main.route('/counties', methods=['POST'])
+@main_bp.route('/counties', methods=['POST'])
 @csp_header(config_csp)
 def get_counties():
     result = request.json
@@ -134,7 +147,7 @@ def get_counties():
 
 ###########################################################################################    
 #
-@main.route('/twitter', methods = ['POST'])
+@main_bp.route('/twitter', methods = ['POST'])
 @token_required
 @csp_header(config_csp)
 def twitter_feed():
@@ -167,7 +180,7 @@ def twitter_feed():
 
 #################################################################################################
 #Returns predictions of cases/deaths by county
-@main.route('/predictions', methods = ['POST'])
+@main_bp.route('/predictions', methods = ['POST'])
 @token_required
 @csp_header(config_csp)
 def get_predictions():

@@ -14,10 +14,10 @@ import os
 import time
 from config import Config
 
-class SQLConnector(object):
-    """docstring fo SQLConnector."""
+class DBManagement(object):
+    """docstring fo DBManagement."""
 
-    #Class variable for sharing across all SQLCOnnector instances
+    #Class variable for sharing across all DBManagement instances
     db = mysql.connector.connect(host=Config.sql_server,user=Config.sql_user,password=Config.sql_password,database = Config.sql_db, port = 3306, connection_timeout = 220 ,ssl_ca = Config.sql_ssl_ca, ssl_verify_cert=True )
     cursor = db.cursor()
 
@@ -30,8 +30,8 @@ class SQLConnector(object):
             i = i + 1
         #Retry until db is up and running
             try:
-                SQLConnector.db = mysql.connector.connect(host=Config.sql_server,user=Config.sql_user,password=Config.sql_password,database = Config.sql_db, port = 3306, connection_timeout = 220 ,ssl_ca = Config.sql_ssl_ca, ssl_verify_cert=True )
-                SQLConnector.cursor = SQLConnector.db.cursor()
+                DBManagement.db = mysql.connector.connect(host=Config.sql_server,user=Config.sql_user,password=Config.sql_password,database = Config.sql_db, port = 3306, connection_timeout = 220 ,ssl_ca = Config.sql_ssl_ca, ssl_verify_cert=True )
+                DBManagement.cursor = DBManagement.db.cursor()
                 #print('Reconnecting to DB')
                 break
 
@@ -73,9 +73,9 @@ class SQLConnector(object):
     def create_user_table(self):
         while True:
             try:
-                SQLConnector.cursor.execute("DROP TABLE IF EXISTS " + "users")
+                DBManagement.cursor.execute("DROP TABLE IF EXISTS " + "users")
                 sql = "CREATE TABLE "+ "users " +"(id int NOT NULL AUTO_INCREMENT,firstName VARCHAR(45) NOT NULL, lastName VARCHAR(45) NOT NULL,email VARCHAR(45) NOT NULL,userName VARCHAR(45) NOT NULL, password VARCHAR(200) NOT NULL,county VARCHAR(45) NOT NULL, state VARCHAR(45) NOT NULL,PRIMARY KEY (id), UNIQUE(userName), UNIQUE(email));"
-                SQLConnector.cursor.execute(sql)
+                DBManagement.cursor.execute(sql)
                 break
 
             except Exception as e:
@@ -88,14 +88,14 @@ class SQLConnector(object):
         while True:
             try:
                 county_info = data 
-                SQLConnector.cursor.execute("DROP TABLE IF EXISTS " + table_name)
+                DBManagement.cursor.execute("DROP TABLE IF EXISTS " + table_name)
                 sql = "CREATE TABLE "+ table_name +"( fips VARCHAR(45) NOT NULL,state VARCHAR(45) NULL,county VARCHAR(45) NULL, latitude FLOAT NULL, longitude FLOAT NULL, PRIMARY KEY (fips));"
-                SQLConnector.cursor.execute(sql)
+                DBManagement.cursor.execute(sql)
 
                 sql = "INSERT INTO "+ table_name +" (fips, state, county) VALUES (%s, %s, %s)"
                
-                SQLConnector.cursor.executemany(sql, county_info)
-                SQLConnector.db.commit()
+                DBManagement.cursor.executemany(sql, county_info)
+                DBManagement.db.commit()
                 break
 
             except Exception as e:
@@ -130,7 +130,7 @@ class SQLConnector(object):
         while True:
             try:
                 if force_drop:
-                    SQLConnector.cursor.execute("DROP TABLE IF EXISTS " + table_name)
+                    DBManagement.cursor.execute("DROP TABLE IF EXISTS " + table_name)
                 sql = "CREATE TABLE IF NOT EXISTS " + table_name + " ( id INT AUTO_INCREMENT PRIMARY KEY"
                 start = True
                 for column_name,column_type in columns:
@@ -138,7 +138,7 @@ class SQLConnector(object):
 
                 sql = sql + ")"
 
-                SQLConnector.cursor.execute(sql)
+                DBManagement.cursor.execute(sql)
                 break
 
             except Exception as e:
@@ -178,8 +178,8 @@ class SQLConnector(object):
 
             while True:
                 try:
-                    SQLConnector.cursor.execute(sql)
-                    SQLConnector.db.commit() 
+                    DBManagement.cursor.execute(sql)
+                    DBManagement.db.commit() 
                     break
                 except mysql.connector.errors.ProgrammingError as e:
                     print (e)
@@ -193,8 +193,8 @@ class SQLConnector(object):
     def get_tables(self):
         while True:
             try:
-                SQLConnector.cursor.execute("SHOW TABLES")
-                tables = [x for x in SQLConnector.cursor]
+                DBManagement.cursor.execute("SHOW TABLES")
+                tables = [x for x in DBManagement.cursor]
                 break
 
             except Exception as e:
@@ -209,8 +209,8 @@ class SQLConnector(object):
 
             while True:
                 try:
-                    SQLConnector.cursor.execute(query)
-                    result = SQLConnector.cursor.fetchall()
+                    DBManagement.cursor.execute(query)
+                    result = DBManagement.cursor.fetchall()
                     return result
 
                 except Exception as e:
@@ -221,8 +221,8 @@ class SQLConnector(object):
             
             while True:
                 try:
-                    SQLConnector.cursor.execute(query)
-                    result = SQLConnector.cursor.fetchone()
+                    DBManagement.cursor.execute(query)
+                    result = DBManagement.cursor.fetchone()
                     return result
                 
                 except Exception as e:
@@ -235,8 +235,8 @@ class SQLConnector(object):
         
         while True:
             try:
-                SQLConnector.cursor.execute(query + values)
-                SQLConnector.db.commit()
+                DBManagement.cursor.execute(query + values)
+                DBManagement.db.commit()
                 return True
             except Exception as e:
                 logging.exception("FAILED TO INSERT DATA")
@@ -252,8 +252,8 @@ class SQLConnector(object):
         
         while True:
             try:
-                SQLConnector.cursor.execute(full_query)
-                SQLConnector.db.commit()
+                DBManagement.cursor.execute(full_query)
+                DBManagement.db.commit()
                 return True
             except Exception as e:
                 logging.exception("FAILED TO UPDATE DATA")
@@ -266,8 +266,8 @@ class SQLConnector(object):
         while True:
             try:
                 query = f'SELECT county FROM counties where state ="{state}";'
-                SQLConnector.cursor.execute(query)
-                result  = SQLConnector.cursor.fetchall()
+                DBManagement.cursor.execute(query)
+                result  = DBManagement.cursor.fetchall()
                 return result
 
             except Exception as e:
@@ -281,8 +281,8 @@ class SQLConnector(object):
         tmp = None
         while True:
             try:
-                SQLConnector.cursor.execute(query)
-                tmp = SQLConnector.cursor.fetchall()
+                DBManagement.cursor.execute(query)
+                tmp = DBManagement.cursor.fetchall()
                 
                 break
             except Exception as e:
@@ -311,10 +311,10 @@ class SQLConnector(object):
         while True:
             try:
                 if days is None:
-                    SQLConnector.cursor.execute("SELECT * FROM " + fips)
+                    DBManagement.cursor.execute("SELECT * FROM " + fips)
                 else:
-                    SQLConnector.cursor.execute("SELECT * FROM " + fips + " WHERE time>CURRENT_DATE - INTERVAL " + str(days + 1) + " DAY")
-                result  = SQLConnector.cursor.fetchall()
+                    DBManagement.cursor.execute("SELECT * FROM " + fips + " WHERE time>CURRENT_DATE - INTERVAL " + str(days + 1) + " DAY")
+                result  = DBManagement.cursor.fetchall()
                 break
 
             except Exception as e:
@@ -331,8 +331,8 @@ class SQLConnector(object):
 
         while True:
             try:
-                SQLConnector.cursor.execute(query)
-                result = SQLConnector.cursor.fetchall()
+                DBManagement.cursor.execute(query)
+                result = DBManagement.cursor.fetchall()
                 break
 
             except Exception as e:
@@ -353,8 +353,8 @@ class SQLConnector(object):
         result = None
         while True:
             try:
-                SQLConnector.cursor.execute(query)
-                result = SQLConnector.cursor.fetchall()
+                DBManagement.cursor.execute(query)
+                result = DBManagement.cursor.fetchall()
                 break
 
             except Exception as e:

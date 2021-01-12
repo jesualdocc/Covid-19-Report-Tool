@@ -6,14 +6,14 @@ sys.path.append(dirname)
 sys.path.append(app_package_dir)
 
 import time
-from sql_connector import SQLConnector
+from sql_connector import DBManagement
 from git import Repo
 
 class Initiate_Database():
     #Creates tables and inserts history data
     def __init__(self):
         
-        self.sql = SQLConnector()
+        self.sql = DBManagement()
 
     def get_commits(self, count):
         '''

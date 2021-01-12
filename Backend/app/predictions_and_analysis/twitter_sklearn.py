@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import re
 import string
-from configuration.config import Config
+from config import Config
 
 #For word processing
 from nltk.corpus import stopwords

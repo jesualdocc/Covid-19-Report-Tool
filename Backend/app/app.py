@@ -5,9 +5,9 @@ from flask_cors import CORS
 import schedule
 from waitress import serve
 from predictions_and_analysis.predictor import Covid_Predictor
-from db.sql_connector import SQLConnector
-from routes.users_routes import users
-from routes.main_routes import main
+from db.sql_connector import DBManagement
+from routes.users_routes import users_bp
+from routes.main_routes import main_bp
 
 #Application Configuration
 app = Flask(__name__)
@@ -19,8 +19,8 @@ cors_config = {
 CORS(app, resources={r"/*": cors_config})
 
 #Adding routes
-app.register_blueprint(users)
-app.register_blueprint(main)
+app.register_blueprint(users_bp)
+app.register_blueprint(main_bp)
 
 #Configuring response headers
 @app.after_request
@@ -38,7 +38,7 @@ def indexpage():
 
 #Establisk conection to db 
 
-sql = SQLConnector()
+sql = DBManagement()
 
 #############################################
 
@@ -70,7 +70,7 @@ def run_schedule():
     while True:
         global stop_thread
         schedule.run_pending()
-        time.sleep(50)
+        time.sleep(30)
 
         if stop_thread:
             break
@@ -88,10 +88,10 @@ if __name__=="__main__":
     th_schedule.start()
     
     #Starts Flask application for development
-    #app.run(host='0.0.0.0', port=8000) 
+    app.run(host='0.0.0.0', port=8000) 
     
     #Start application for production
-    serve(app, host='0.0.0.0', port=8000)
+    #serve(app, host='0.0.0.0', port=8000)
   
     stop_thread = True
     th_schedule.join() #Stop Schedule operations
