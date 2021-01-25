@@ -162,8 +162,7 @@ class DbManagement(object):
         else:
             for count, id in enumerate(uid_list):
                 
-                table_name = 'fips_1001'
-                #table_name = 'UID_' + str(id)
+                table_name = 'UID_' + str(id)
 
                 #Drop ID column (Only date columns remain after)
                 df_c = df_cases[df_cases['UID'] == id] #Filter by ID (row)
@@ -454,7 +453,7 @@ class DbManagement(object):
         #Creates all tables, drops existing one
         self.create_initial_tables()
         #Inserts history data
-        self.insert_new_data(True)
+        self.insert_new_data(initial_setup=True)
         print('-------------------------- DATABASE SETUP COMPLETE -----------------------------')
 
         
