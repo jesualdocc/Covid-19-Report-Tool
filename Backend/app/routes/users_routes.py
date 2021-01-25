@@ -59,9 +59,7 @@ def login():
         return make_response(jsonify({'message':'Invalid paramentes'}), 400)
    
     if 'userName' in result and 'password' in result:
-        
         user = sql.find_users(result['userName'])
-       
         if user is None:
             return jsonify({'message': 'Username or Password is incorrect'}), 401
 

@@ -282,6 +282,19 @@ class DbManagement(object):
                 except DbException.DatabaseError as e:
                     if e.args[0] == 2003:
                         self.connect_to_db()
+        
+        else:
+            query = "SELECT * FROM users WHERE userName='" + str(username) + "'"
+            
+            while True:
+                try:
+                    DbManagement.cursor.execute(query)
+                    result = DbManagement.cursor.fetchone()
+                    return result
+                
+                except DbException.DatabaseError as e:
+                    if e.args[0] == 2003:
+                        self.connect_to_db()
     
     def add_user(self, user:dict):
         #Function to add new user
