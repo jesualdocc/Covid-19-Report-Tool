@@ -5,7 +5,7 @@ from flask_cors import CORS
 import schedule
 from waitress import serve
 from predictions_and_analysis.predictor import Covid_Predictor
-from db.sql_connector import DBManagement
+from db.sql_connector import DbManagement
 from routes.users_routes import users_bp
 from routes.main_routes import main_bp
 
@@ -38,7 +38,7 @@ def indexpage():
 
 #Establisk conection to db 
 
-sql = DBManagement()
+sql = DbManagement()
 
 #############################################
 

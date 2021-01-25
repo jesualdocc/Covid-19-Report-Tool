@@ -16,11 +16,11 @@ from flask_limiter.util import get_remote_address
 from jsonschema import validate
 from jwt_auth import token_required
 from predictions_and_analysis.twitter_textblob import Twitter_Textblob
-from db.sql_connector import DBManagement
+from db.sql_connector import DbManagement
 from predictions_and_analysis.predictor import Covid_Predictor
 
 main_bp = Blueprint('main_bp', __name__)
-sql = DBManagement()
+sql = DbManagement()
 
 #Configuring Blueprint/Routes
 config_csp = {
@@ -98,21 +98,21 @@ def data():
         
         county = result['county']
         state = result['state']
-        fips = sql.get_fips(state,county)
+        uid = sql.get_uid(state,county)
         data = None
 
-        if fips is None:
+        if uid is None:
             return jsonify({"ERROR":"COUNTY AND STATE MISMATCH",'request':{}}), 204 #No Content
 
         if 'days' in result:
             days = result['days']
           
-            data = sql.get_county_info(fips, days)
+            data = sql.get_county_info(uid, days)
             
         else:
-            data = sql.get_county_info(fips)
+            data = sql.get_county_info(uid)
         
-        return make_response(jsonify({"fips":fips,'data':data}), 200)
+        return make_response(jsonify({"UID":uid,'data':data}), 200)
     
     else:
         return make_response(jsonify({}), 400)

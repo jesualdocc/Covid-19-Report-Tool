@@ -16,11 +16,11 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from jsonschema import validate
 from config import Config
-from db.sql_connector import DBManagement
+from db.sql_connector import DbManagement
 from jwt_auth import token_required
 
 users_bp = Blueprint('users_bp', __name__)
-sql = DBManagement()
+sql = DbManagement()
 
 limiter = Limiter(
     key_func=get_remote_address,

@@ -48,10 +48,10 @@ class Covid_Predictor(object):
       model_deaths.fit(x_deaths, y_deaths)
 
       #Save models by unique identifier fips
-      fips = self.sql.get_fips(self.state, self.county)
+      uid = self.sql.get_uid(self.state, self.county)
       dirname = os.path.dirname(__file__)
-      filename_c = os.path.join(dirname, f'trained_models/Cases {fips}')
-      filename_d = os.path.join(dirname, f'trained_models/Deaths {fips}')
+      filename_c = os.path.join(dirname, f'trained_models/Cases {uid}')
+      filename_d = os.path.join(dirname, f'trained_models/Deaths {uid}')
               
       #Serialize data and save it for prediction
       joblib.dump(model_cases, filename_c)
@@ -71,10 +71,10 @@ class Covid_Predictor(object):
       poly_features_deaths = PolynomialFeatures(degree=self.degree_deaths)
 
       #Loading saved model
-      fips = self.sql.get_fips(self.state, self.county)
+      uid = self.sql.get_uid(self.state, self.county)
       dirname = os.path.dirname(__file__)
-      filename_c = os.path.join(dirname, f'trained_models/Cases {fips}')
-      filename_d = os.path.join(dirname, f'trained_models/Deaths {fips}')
+      filename_c = os.path.join(dirname, f'trained_models/Cases {uid}')
+      filename_d = os.path.join(dirname, f'trained_models/Deaths {uid}')
 
       model_cases = joblib.load(filename_c)
       model_deaths = joblib.load(filename_d)
