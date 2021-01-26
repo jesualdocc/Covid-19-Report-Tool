@@ -365,7 +365,21 @@ class DbManagement(object):
             return None
         else:
             return result[0][0]
-            
+
+    def get_lat_lon(self, county, state):
+        query = 'SELECT latitude, longitude FROM counties WHERE state="' + str(state) +'" AND county="' + str(county) + '";'
+
+        while True:
+            try:
+                DbManagement.cursor.execute(query)
+                result = DbManagement.cursor.fetchone()
+
+                return result
+
+            except DbException.DatabaseError as e:
+                if e.args[0] == 2003:
+                    self.connect_to_db()
+
 
     def get_all_state_county(self):
         query = "SELECT county, state FROM counties;"
