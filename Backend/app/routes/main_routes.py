@@ -102,22 +102,17 @@ def data():
 
         county = result['county']
         state = result['state']
-        uid = sql.get_uid(state, county)
         data = None
-
-        if uid is None:
-            # No Content
-            return jsonify({"ERROR": "COUNTY AND STATE MISMATCH", 'request': {}}), 204
 
         if 'days' in result:
             days = result['days']
 
-            data = sql.get_county_info(uid, days)
+            data = sql.get_county_info(county=county, state=state, days=days)
 
         else:
-            data = sql.get_county_info(uid)
+            data = sql.get_county_info(county=county, state=state)
 
-        return make_response(jsonify({"UID": uid, 'data': data}), 200)
+        return make_response(jsonify({'data': data}), 200)
 
     else:
         return make_response(jsonify({}), 400)

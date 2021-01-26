@@ -20,7 +20,7 @@ class Covid_Predictor(object):
       #get data
       try:
        
-        data = self.sql.get_all_data_per_county(self.county, self.state)
+        data = self.sql.get_county_info(county=self.county, state=self.state, prediction=True)
         
       except Exception as e:
         return False
@@ -48,7 +48,7 @@ class Covid_Predictor(object):
       model_deaths.fit(x_deaths, y_deaths)
 
       #Save models by unique identifier fips
-      uid = self.sql.get_uid(self.state, self.county)
+      uid = self.sql.get_uid(county=self.county, state =self.state)
       dirname = os.path.dirname(__file__)
       filename_c = os.path.join(dirname, f'trained_models/Cases {uid}')
       filename_d = os.path.join(dirname, f'trained_models/Deaths {uid}')
@@ -71,7 +71,7 @@ class Covid_Predictor(object):
       poly_features_deaths = PolynomialFeatures(degree=self.degree_deaths)
 
       #Loading saved model
-      uid = self.sql.get_uid(self.state, self.county)
+      uid = self.sql.get_uid(county=self.county, state =self.state)
       dirname = os.path.dirname(__file__)
       filename_c = os.path.join(dirname, f'trained_models/Cases {uid}')
       filename_d = os.path.join(dirname, f'trained_models/Deaths {uid}')
@@ -84,7 +84,7 @@ class Covid_Predictor(object):
 
       try:
         #Number of records for each county in the database
-        data = self.sql.get_all_data_per_county(self.county, self.state)
+        data = self.sql.get_county_info(county=self.county, state=self.state, prediction=True)
         total_count = len(data)
       except:
         return predictions

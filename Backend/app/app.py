@@ -38,7 +38,7 @@ def add_header(response):
 def indexpage():
     return 'Server Running @JCC 2021 01/25'
 
-#Establisk conection to db 
+#Establish conection to db 
 
 sql = DbManagement()
 
@@ -61,6 +61,8 @@ def get_latest_data():
     #Get daily update
     global sql 
     sql.update_db() #Latest data
+
+
 ####################################################
 def update_globe_data():
     #Cache data for globe (Threejs)
@@ -68,22 +70,21 @@ def update_globe_data():
 
     global sql
     try:
-        locations = sql.get_all_state_county()  # county, state
+        locations = sql.get_all_state_county()  # county, state, latitude, longitude
 
         data = []
         for res in locations:
-            #res => res[0] - county, res[1] - state
-            coordinates = sql.get_lat_lon(county=res[0], state=res[1])
-            uid = sql.get_uid(county = res[0], state = res[1])
-            tmp = sql.get_county_info(uid, 1)
+            #res => res[0] - county, res[1] - state, res[2] - population, res[3] - latitude, res[4] -longitude
+            tmp = sql.get_county_info(county = res[0], state = res[1], days=1)
 
             date = list(tmp.keys())[0]
-
             values = list(tmp.values())[0] #cases, deaths
+
             values['county'] = res[0]
             values['state']  = res[1]
-            values['latitude'] = coordinates[0]
-            values['longitude'] = coordinates[1]
+            values['population'] = res[2]
+            values['latitude'] = res[3]
+            values['longitude'] = res[4]
             values['last_update'] = date
             data.append(values)
  

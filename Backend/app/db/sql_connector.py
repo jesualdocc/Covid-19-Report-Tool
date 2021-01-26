@@ -41,13 +41,13 @@ class DbManagement(object):
 
     def create_initial_tables(self):
         dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, 'cases.csv')
+        filename = os.path.join(dirname, 'deaths.csv')
         
         df = pd.read_csv(filename)
         columns_to_drop = ['iso2', 'iso3', 'code3', 'Country_Region', 'Combined_Key']
         df = df.drop(columns=columns_to_drop)
      
-        county_columns = ['UID','FIPS','Province_State','Admin2', 'Lat', 'Long_']
+        county_columns = ['UID','FIPS','Province_State','Admin2', 'Population', 'Lat', 'Long_']
   
         self.create_and_seed_list_of_counties_table('counties', df.filter(county_columns))
         self.create_user_table()
@@ -78,10 +78,10 @@ class DbManagement(object):
             try:
              
                 DbManagement.cursor.execute("DROP TABLE IF EXISTS " + table_name)
-                sql = "CREATE TABLE "+ table_name +"(uid INT NOT NULL , fips VARCHAR(45) NOT NULL,state VARCHAR(45) NULL,county VARCHAR(45) NULL, latitude FLOAT NULL, longitude FLOAT NULL, PRIMARY KEY (uid));"
+                sql = "CREATE TABLE "+ table_name +"(uid INT NOT NULL PRIMARY KEY, fips VARCHAR(45) NOT NULL,state VARCHAR(45) NULL,county VARCHAR(45) NULL, population INT NULL, latitude FLOAT NULL, longitude FLOAT NULL);"
                 DbManagement.cursor.execute(sql)
 
-                sql = f"INSERT INTO "+ table_name +" (uid, fips, state, county, latitude, longitude) VALUES (%s, %s, %s, %s, %s, %s)"
+                sql = f"INSERT INTO "+ table_name +" (uid, fips, state, county, population, latitude, longitude) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 DbManagement.cursor.executemany(sql, county_info) #2D-List
                 DbManagement.db.commit()
                 break
@@ -117,17 +117,19 @@ class DbManagement(object):
         df_deaths = pd.read_csv(filename_deaths)
 
        #Drop columns not needed
-        columns_to_drop_c = ['iso2', 'iso3', 'code3', 'Country_Region', 'Combined_Key', 'FIPS','Province_State','Admin2', 'Lat', 'Long_']
-        columns_to_drop_d = columns_to_drop_c + ['Population'] 
+        columns_to_drop = ['iso2', 'iso3', 'code3', 'Country_Region', 'Combined_Key', 'FIPS','Province_State','Admin2', 'Lat', 'Long_']
      
-        df_cases = df_cases.drop(columns=columns_to_drop_c)
-        df_deaths = df_deaths.drop(columns=columns_to_drop_d)
+        df_cases = df_cases.drop(columns=columns_to_drop)
+        df_deaths = df_deaths.drop(columns=columns_to_drop)
  
         uid_list = df_cases['UID']
         total_counties = len(uid_list)
  
         if initial_setup:
-           
+
+            df_deaths = df_deaths.drop(columns=['Population'])
+
+            #Insert History daily data
             for count, id in enumerate(uid_list):
                 table_name = "UID_" + str(id)
                 #Cases
@@ -160,6 +162,17 @@ class DbManagement(object):
             return True
                
         else:
+            #Update population in counties table
+            for count, id in enumerate(uid_list):
+                df_d = df_deaths[df_deaths['UID'] == id] #Filter by ID (row)
+                population_count = df_d['Population'][0]
+                query = f"UPDATE counties SET population={population_count} WHERE uid={id};"
+                
+                DbManagement.cursor.execute(query)
+                DbManagement.db.commit()
+                  
+            #Insert Daily Data Until last update
+            df_deaths = df_deaths.drop(columns=['Population'])
             for count, id in enumerate(uid_list):
                 
                 table_name = 'UID_' + str(id)
@@ -366,23 +379,8 @@ class DbManagement(object):
         else:
             return result[0][0]
 
-    def get_lat_lon(self, county, state):
-        query = 'SELECT latitude, longitude FROM counties WHERE state="' + str(state) +'" AND county="' + str(county) + '";'
-
-        while True:
-            try:
-                DbManagement.cursor.execute(query)
-                result = DbManagement.cursor.fetchone()
-
-                return result
-
-            except DbException.DatabaseError as e:
-                if e.args[0] == 2003:
-                    self.connect_to_db()
-
-
     def get_all_state_county(self):
-        query = "SELECT county, state FROM counties;"
+        query = "SELECT county, state, population, latitude, longitude FROM counties;"
         result = None
 
         while True:
@@ -400,19 +398,20 @@ class DbManagement(object):
         else:
             return result
 
-    def get_county_info(self,uid,days = None):
+    def get_county_info(self,county, state,prediction=False, days = None):
         '''
         Function to get info per county: UID = UID_84008031
         '''
+        uid = self.get_uid(county=county, state=state)
         table_name = 'UID_' + str(uid)
-        result = None
+        tmp_result = None
         while True:
             try:
                 if days is None:
                     DbManagement.cursor.execute("SELECT * FROM " + table_name)
                 else:
                     DbManagement.cursor.execute("SELECT * FROM " + table_name + " WHERE time>CURRENT_DATE - INTERVAL " + str(days + 1) + " DAY")
-                result  = DbManagement.cursor.fetchall()
+                tmp_result  = DbManagement.cursor.fetchall()
                 
                 break
 
@@ -420,42 +419,23 @@ class DbManagement(object):
                 if e.args[0] == 2003:
                     self.connect_to_db()
         
-        refined_result = {}
-        for res in result:
-            #Date is key of refined result
-            refined_result[res[-1].strftime("%m/%d/%Y")] = {"cases":res[1],"deaths":res[2]}
-        
-        return refined_result
-    
-    def get_all_data_per_county(self, county:str, state:str):
-        uid = self.get_uid(state, county)
-        table_name = 'UID_' + str(uid)
-        query = "SELECT * FROM " + table_name +";"
-        
-        tmp = None
-        while True:
-            try:
-                DbManagement.cursor.execute(query)
-                tmp = DbManagement.cursor.fetchall()
-                break
-
-            except DbException.DatabaseError as e:
-                if e.args[0] == 2003:
-                    self.connect_to_db()
-        
-        result = []
         remove_duplicate_dates = {}
-        
-        for res in tmp:
-            remove_duplicate_dates[res[-1].strftime("%m/%d/%Y")] = {'id':res[0], 'cases': res[1], 'deaths': res[2]}
-            
-        count = 1
-        for date, values in remove_duplicate_dates.items():
-            data = [count, values['cases'], values['deaths']]
-            result.append(data)
-            count = count + 1
-        
-        return result
+
+        for res in tmp_result:
+            #Date is key of refined result
+            remove_duplicate_dates[res[-1].strftime("%m/%d/%Y")] = {"cases":res[1],"deaths":res[2]}
+
+        if prediction:
+            result = []
+            count = 1
+            for values in remove_duplicate_dates.items():
+                data = [count, values['cases'], values['deaths']]
+                result.append(data)
+                count = count + 1
+            return result
+
+        return remove_duplicate_dates
+    
     
     def inital_set_up(self):
         '''
@@ -476,4 +456,3 @@ class DbManagement(object):
         self.fetch_online_data()
         #Updates db with latest records
         self.insert_new_data()
-        
