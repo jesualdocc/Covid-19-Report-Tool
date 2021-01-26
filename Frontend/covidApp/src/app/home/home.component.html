@@ -1,78 +1,89 @@
-<div style="text-align: center;">
-  <br>
-  <br>
-  <h3>To get full access to the application features (Reports, Predictions, Twitter Sentiment analysis), <a [routerLink]="['/registration']">Create</a> and/or <a [routerLink]="['/login']">Login</a> to your account</h3>
-  <p>Disclaimer: Covid predictions are for educational/learning purposes only </p>
-  <br>
-  <br>
-</div>
+<div *ngIf="!globeView">
 
-<div class="centerVH" *ngIf="loading">
-  <mat-spinner></mat-spinner>
-</div>
-
-<div *ngIf="!loading && !submitted">
-  <mat-card>
-    <div class="container" style="width:50%">
-      <form (ngSubmit)="onSubmit()" #userForm="ngForm">
-
-        <div class="form-group">
-          <label for="state">State</label>
-          <select class="form-control" id="role" required [(ngModel)]="model.state" name="state" #state="ngModel"
-            placeholder="d.ff" (change)="getStateCounties(state.value)">
-            <option hidden value="" disabled selected>Select State </option>>
-            <option *ngFor="let state of states" [value]="state">{{state}}</option>
-          </select>
-
-          <div *ngIf="state.invalid && state.touched" class="alert alert-danger">
-
-            <div *ngIf="state.errors.required">
-              State is required.
-            </div>
-          </div>
-
-        </div>
-
-        <div class="form-group">
-          <label for="county">County</label>
-          <select class="form-control" id="role" [disabled]="!countyListEnable" required [(ngModel)]="model.county"
-            name="county" #county="ngModel" placeholder="d.ff">
-            <option hidden value="" disabled selected>Select County </option>>
-            <option *ngFor="let county of counties" [value]="county">{{county}}</option>
-          </select>
-
-          <div *ngIf="state.invalid && state.touched" class="alert alert-danger">
-
-            <div *ngIf="state.errors.required">
-              Counties is required.
-            </div>
-          </div>
-
-        </div>
-
-        <br>
-        <div style="text-align: center;">
-          <button type="submit" class="btn btn-success" [disabled]="!userForm.form.valid">Get Report</button>
-
-          <div *ngIf="errorMessage" class="alert alert-danger">
-            {{submissionMessage}}
-          </div>
-        </div>
-      </form>
-    </div>
-  </mat-card>
-</div>
-
-<!-- Show Table -->
-
-<div *ngIf="!loading && submitted">
-  <app-table></app-table>
-  <br>
   <div style="text-align: center;">
-    <button mat-raised-button class="btn btn-success" (click)="newReport()" >Get New Report</button>
+    <br>
+    <br>
+    <h3>To get full access to the application features (Reports, Predictions, Twitter Sentiment analysis), <a
+        [routerLink]="['/registration']">Create</a> and/or <a [routerLink]="['/login']">Login</a> to your account</h3>
+    <p>Disclaimer: Covid predictions are for educational/learning purposes only </p>
+    <br>
     <br>
   </div>
-</div>
-<br>
-<br>
 
+  <div class="centerVH" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading && !submitted">
+    <mat-card>
+      <div class="container" style="width:50%">
+        <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+
+          <div class="form-group">
+            <label for="state">State</label>
+            <select class="form-control" id="role" required [(ngModel)]="model.state" name="state" #state="ngModel"
+              placeholder="d.ff" (change)="getStateCounties(state.value)">
+              <option hidden value="" disabled selected>Select State </option>>
+              <option *ngFor="let state of states" [value]="state">{{state}}</option>
+            </select>
+
+            <div *ngIf="state.invalid && state.touched" class="alert alert-danger">
+
+              <div *ngIf="state.errors.required">
+                State is required.
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="county">County</label>
+            <select class="form-control" id="role" [disabled]="!countyListEnable" required [(ngModel)]="model.county"
+              name="county" #county="ngModel" placeholder="d.ff">
+              <option hidden value="" disabled selected>Select County </option>>
+              <option *ngFor="let county of counties" [value]="county">{{county}}</option>
+            </select>
+
+            <div *ngIf="state.invalid && state.touched" class="alert alert-danger">
+
+              <div *ngIf="state.errors.required">
+                Counties is required.
+              </div>
+            </div>
+
+          </div>
+
+          <br>
+          <div style="text-align: center;">
+            <button type="submit" class="btn btn-success" [disabled]="!userForm.form.valid">Get Report (Table View)</button>
+
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{submissionMessage}}
+            </div>
+          </div>
+        </form>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Show Table -->
+
+  <div *ngIf="!loading && submitted">
+    <app-table></app-table>
+    <br>
+    <div style="text-align: center;">
+      <button mat-raised-button class="btn btn-success" (click)="newReport()">Get New Report</button>
+      <br>
+    </div>
+  </div>
+  <br>
+  <br>
+</div>
+
+<div style="text-align: center;" *ngIf="!globeView && !submitted">
+  <button mat-raised-button class="btn btn-success" (click)="switchToGlobe()">Get Map (Globe View)</button>
+</div>
+
+<div *ngIf="globeView">
+  <app-globe-threejs></app-globe-threejs>
+</div>

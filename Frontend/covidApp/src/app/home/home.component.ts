@@ -24,6 +24,7 @@ export class HomeComponent implements OnInit {
   errorMessage = false;
   loading:boolean = false;
   countyListEnable = false;
+  globeView = false;
 
 
   constructor(private dataService:DataService, private router:Router) {
@@ -70,6 +71,11 @@ export class HomeComponent implements OnInit {
     this.model = new Users();
     this.countyListEnable = false;
     this.submitted = false;
+
+  }
+
+  switchToGlobe(){
+    this.globeView = true;
 
   }
 

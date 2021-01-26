@@ -139,4 +139,18 @@ currentPageTitle = this.pageTitle.asObservable();
     return this.http.post<any>(url, user, httpOptions)
   }
 
+  getGlobeData():Observable<any>{
+    var url = this.mainRoute + '/globedata';
+
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({
+        'token': this.loginService.getToken()
+      })
+    }
+
+    return this.http.get<any>(url,httpOptions)
+  }
+
 }

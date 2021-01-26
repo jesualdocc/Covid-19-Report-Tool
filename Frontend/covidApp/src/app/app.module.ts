@@ -1,3 +1,4 @@
+import { GlobeThreejsComponent } from './home/globe-threejs/globe-threejs.component';
 import { TableComponent } from './home/table/table.component';
 import { CovidtableComponent } from './reports/covidtable/covidtable.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -44,6 +45,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     HomeComponent,
     LoginComponent,
     TableComponent,
+    GlobeThreejsComponent,
     RegistrationComponent
   ],
   imports: [

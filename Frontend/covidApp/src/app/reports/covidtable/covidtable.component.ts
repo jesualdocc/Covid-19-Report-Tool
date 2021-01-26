@@ -15,7 +15,7 @@ import {ICovidData} from '../CovidData';
 export class CovidtableComponent implements AfterViewInit {
 
 
-  displayedColumns: string[] = ['date','cases', 'deaths', 'confirmedCases', 'confirmedDeaths'];
+  displayedColumns: string[] = ['date','cases', 'deaths'];
   dataSource:MatTableDataSource<ICovidData>;
   response:any;
   loading:boolean = false;
@@ -75,16 +75,13 @@ export class CovidtableComponent implements AfterViewInit {
      //Get key(dates) and values({cases, deaths...} )
      Object.keys(data).forEach(function(key) {
 
-      var arr:ICovidData = {cases: 0, confirmedCases: 0,confirmedDeaths: 0,
-      date: "", deaths: 0, str:""};
+      var arr:ICovidData = {cases: 0, date: "", deaths: 0};
 
       var values = data[key];
       values['date'] = key;
 
       arr.cases = values['cases'];
       arr.deaths = values['deaths'];
-      arr.confirmedCases = values['confirmed_cases'];
-      arr.confirmedDeaths = values['confirmed_deaths'];
       arr.date = values['date'];
 
       arrData.push(arr);

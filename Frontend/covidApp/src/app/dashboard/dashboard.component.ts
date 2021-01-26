@@ -36,8 +36,8 @@ export class DashboardComponent implements OnInit {
 
         const chart3 = new BarGraph('chart3', [cases, deaths]);
 
-        var casesConfirmed = this.formatData(data, 'confirmed_cases', 1);
-        var deathsConfirmed = this.formatData(data, 'confirmed_deaths', 1);
+        var casesConfirmed = this.formatData(data, 'cases', 1);
+        var deathsConfirmed = this.formatData(data, 'deaths', 1);
 
         const chart2 = new PieGraph('chart4', [casesConfirmed, deathsConfirmed]);
       },

@@ -57,8 +57,7 @@ export class CovidpredictionsComponent {
 
 
     for (let i = 0; i < days; i++){
-      var arr:ICovidData = {cases: 0, confirmedCases: 0,confirmedDeaths: 0,
-        date: "", deaths: 0, str:""};
+      var arr:ICovidData = {cases: 0, date: "", deaths: 0};
 
       var nextDate = new Date();
       nextDate.setDate(nextDate.getDate() + 1 + i);

@@ -12,7 +12,7 @@ import { DataService } from 'src/app/services/data.service';
 })
 export class TableComponent implements OnInit {
 
-  displayedColumns: string[] = ['date','cases', 'deaths', 'confirmedCases', 'confirmedDeaths'];
+  displayedColumns: string[] = ['date','cases', 'deaths'];
   dataSource:MatTableDataSource<ICovidData>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort:MatSort;
@@ -50,16 +50,14 @@ export class TableComponent implements OnInit {
      //Get key(dates) and values({cases, deaths...} )
      Object.keys(data).forEach(function(key) {
 
-      var arr:ICovidData = {cases: 0, confirmedCases: 0,confirmedDeaths: 0,
-      date: "", deaths: 0, str:""};
+      var arr:ICovidData = {cases: 0, date: "", deaths: 0};
 
       var values = data[key];
       values['date'] = key;
 
       arr.cases = values['cases'];
       arr.deaths = values['deaths'];
-      arr.confirmedCases = values['confirmed_cases'];
-      arr.confirmedDeaths = values['confirmed_deaths'];
+
       arr.date = values['date'];
 
       arrData.push(arr);
