@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit {
   }
 
   switchToGlobe(){
-    this.globeView = true;
+    this.router.navigate(['globeview']);
 
   }
 

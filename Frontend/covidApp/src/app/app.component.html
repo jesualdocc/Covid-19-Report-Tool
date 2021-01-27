@@ -7,13 +7,13 @@
 
     <app-sidebar  *ngIf="showSidebar && activeMenu" fxLayout="column" fxFlex="250px" class="bar"></app-sidebar>
 
-    <div class="content" fxLayout="column" fxFlex>
+    <div class="content" [ngClass]="{'regularcontent' : !isGlobeView,'globeview' : isGlobeView}" fxLayout="column" fxFlex>
       <router-outlet ></router-outlet>
     </div>
 
   </div>
 
-  <footer>
+  <footer *ngIf="showFooter">
     <app-footer></app-footer>
   </footer>
 

@@ -25,6 +25,11 @@ const routes: Routes = [
   data: { showHeader:false, showSidebar:false}
 },
 {
+  path:'globeview',
+  loadChildren:() => import('./home/globe-threejs/globe-threejs.module').then(m=> m.GlobeThreejsModule),
+  data: { showHeader:true, showSidebar:false, showFooter: false}
+},
+{
   path:'twitter',
   loadChildren:()=> import ('./twitter/twitter.module').then(m=>m.TwitterModule),
   data: { showHeader:true, showSidebar:true},

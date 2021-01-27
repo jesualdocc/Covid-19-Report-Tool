@@ -10,9 +10,15 @@
   align-items:center;
 }
 
-.content{
+.regularcontent{
   border:solid;
   min-height:100vh;
+}
+
+.globeview{
+  /* Threejs */
+  border:solid;
+
 }
 
 footer {

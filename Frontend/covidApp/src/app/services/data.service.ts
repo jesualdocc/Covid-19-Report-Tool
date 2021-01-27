@@ -19,6 +19,9 @@ mainRoute:string;
 private sidebar = new BehaviorSubject(false);
 currentSidebarStatus = this.sidebar.asObservable();
 
+private isGlobeView = new BehaviorSubject(false);
+currentView = this.isGlobeView.asObservable();
+
 private pageTitle = new BehaviorSubject("");
 currentPageTitle = this.pageTitle.asObservable();
 
@@ -28,6 +31,10 @@ currentPageTitle = this.pageTitle.asObservable();
 
   showSideBar(status:boolean){
     this.sidebar.next(status);
+  }
+
+  changeView(status:boolean){
+    this.isGlobeView.next(status);
   }
 
   changePageTitle(title:string){

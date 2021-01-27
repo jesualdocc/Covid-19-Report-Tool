@@ -1,1 +1,19 @@
-<p>globe-threejs works!</p>
+
+
+  <div class="mycontrols">
+    <button  class="btn mybutton">Show Locations</button>
+    <span style="margin-bottom: 1em;"></span>
+    <button  class="btn mybutton" (click)="setupCamera()">Reset Camera (Default View)</button>
+    <span style="margin-bottom: 1em;"></span>
+    <button class="btn mybutton" (click)="displayInstructionsBox()">{{buttonNameInst}}</button>
+  </div>
+
+
+<div class="instruction-box" *ngIf="showInstructionsBox">
+  <div style="text-align: center;">
+    <h3>INSTRUCTIONS</h3>
+  </div>
+  <h3>1) Click on Show Locations</h3>
+  <h3>2) Click, Hold, and Drag mouse to rotate Globe</h3>
+  <h3>3) Click on a point to display location data</h3>
+</div>

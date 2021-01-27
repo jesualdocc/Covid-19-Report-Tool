@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { animationFrameScheduler } from 'rxjs';
+import { DataService } from 'src/app/services/data.service';
 import * as THREE from 'three';
-import { OrbitControls } from 'three-orbit-controls';
+//import { OrbitControls } from 'three-orbit-controls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {IGlobeData} from './IGlobeData';
 
 @Component({
@@ -8,36 +11,112 @@ import {IGlobeData} from './IGlobeData';
   templateUrl: './globe-threejs.component.html',
   styleUrls: ['./globe-threejs.component.css'],
 })
-export class GlobeThreejsComponent implements OnInit {
+export class GlobeThreejsComponent implements OnInit, OnDestroy {
 
-  data:IGlobeData [] = [];
-  public scene: THREE.Scene;
-  private camera: THREE.PerspectiveCamera;
-  private renderer: THREE.WebGLRenderer;
-  private earthClouds:THREE.Mesh;
-  public controls: OrbitControls;
+  private data:IGlobeData [] = []; //holds api data
+  scene:THREE.Scene; //where objects will be placed (kind of like a stage)
+  camera:THREE.PerspectiveCamera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight,0.1,1000);
+  renderer:THREE.WebGLRenderer; //display the created objects
+  raycaster:THREE.Raycaster; //raycaster for mouse interaction
+  mouse:THREE.Vector2; // CREATE vector2 for mouse x,y coordinates
 
-  constructor() {}
+  earthClouds:THREE.Mesh;
+  controls: OrbitControls;
 
-  ngOnInit(): void {}
+  loadindData:boolean = false;
+  showInstructionsBox:boolean = true;
+  //Change button name depending value of showInstructionsBox
+  get buttonNameInst():string{
+    return this.showInstructionsBox ? 'Hide Instructions':'Show Instructions';
+  }
+
+  private animationId:number;
+
+  constructor(private dataService:DataService) {
+    this.dataService.changeView(true);
+    this.start();
+
+  }
+  ngOnDestroy(): void {
+    //Stop animation and delete all objects
+    cancelAnimationFrame(this.animationId);
+
+    document.body.removeChild(this.renderer.domElement);
+    this.scene.clear()
+    this.renderer.dispose()
+    this.camera.clear();
+    this.controls.dispose();
+
+  }
+
+  ngOnInit(): void { }
 
   start(){
+    this.getData();
     this.createScene()
-    this.createEarth()
+    this.setupCamera();
+    this.setupMouseInteractivity();
+    this.configureRenderer();
+    this.addListeners()
+    this.createEarth();
+    this.setupControls();
+
+    this.animate()
   }
+
+  // Allows for the scene to move and be interacted with
+  animate(){
+    this.animationId = requestAnimationFrame(this.animate.bind(this));
+    this.renderer.render(this.scene, this.camera);
+    this.controls.update();
+  }
+
+  private createScene(){
+    //where objects will be placed (kind of like a stage)
+    this.scene = new THREE.Scene();
+  }
+
+  setupCamera() {
+
+    // Change position so we can see the objects (change x, y for default country/continent view)
+    this.camera.position.x = -3.5;
+    this.camera.position.y = 13.5;
+    this.camera.position.z = 15;
+    //Returns camera to default settings
+  }
+
+
+  private setupControls(){
+    // CREATE controls so that we can interact with the objects/have interactivity
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+
+    // Disable control function, so users do not zoom too far in or pan away from center
+    this.controls.minDistance = 12;
+    this.controls.maxDistance = 30;
+    this.controls.enablePan = false;
+    this.controls.update();
+    this.controls.saveState();
+
+  }
+
+  private setupMouseInteractivity(){
+    this.raycaster = new THREE.Raycaster(); //raycaster for mouse interaction
+    this.mouse = new THREE.Vector2(); // CREATE vector2 for mouse x,y coordinates
+  }
+
 
   private createEarth() {
     // Earthmap is used for the basic texture which has the various continents/countries/etc. on it
-    let earthMap = new THREE.TextureLoader().load('./images/earthmap4k.jpg');
+    let earthMap = new THREE.TextureLoader().load('assets/myglobe_images/earthmap4k.jpg');
 
     // EarthBumpMap is used to give the texture some "depth" so it is more appealing on eyes and data visuals
     let earthBumpMap = new THREE.TextureLoader().load(
-      './images/earthbump4k.jpg'
+      'assets/myglobe_images/earthbump4k.jpg'
     );
 
     // EarthSpecMap gies the earth some shininess to the environment, allowing reflectivity off of the lights
     let earthSpecMap = new THREE.TextureLoader().load(
-      '../images/earthspec4k.jpg'
+      'assets/myglobe_images/earthspec4k.jpg'
     );
 
     // Geometry is what the shape/size of the globe will be
@@ -72,7 +151,7 @@ export class GlobeThreejsComponent implements OnInit {
 
     // Add cloud texture
     let earthCloudsTexture = new THREE.TextureLoader().load(
-      './images/earthhiresclouds4K.jpg'
+      'assets/myglobe_images/earthhiresclouds4K.jpg'
     );
 
     // Add cloud material
@@ -97,12 +176,12 @@ export class GlobeThreejsComponent implements OnInit {
 
     let loader = new THREE.CubeTextureLoader();
     let texture = loader.load([
-      '../images/space_right.png',
-      '../images/space_left.png',
-      '../images/space_top.png',
-      '../images/space_bot.png',
-      '../images/space_front.png',
-      '../images/space_back.png',
+      'assets/myglobe_images/space_right.png',
+      'assets/myglobe_images/space_left.png',
+      'assets/myglobe_images/space_top.png',
+      'assets/myglobe_images/space_bot.png',
+      'assets/myglobe_images/space_front.png',
+      'assets/myglobe_images/space_back.png',
     ]);
     this.scene.background = texture;
   }
@@ -124,46 +203,22 @@ export class GlobeThreejsComponent implements OnInit {
     }
   }
 
-  createCamera() {
-    this.camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight,0.1,1000);
-    // Change position so we can see the objects
-    this.camera.position.z = 20;
 
-  }
-
-  private createControls(){
-    // CREATE controls so that we can interact with the objects/have interactivity
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-
-    // Disable control function, so users do not zoom too far in or pan away from center
-    this.controls.minDistance = 12;
-    this.controls.maxDistance = 30;
-    this.controls.enablePan = false;
-    this.controls.update();
-    this.controls.saveState();
-
-  }
-
-  private createScene() {
-    //scene is where objects will be placed (kind of like a stage)
-    this.scene = new THREE.Scene();
-  }
-
-  private startRendering() {
-    // CREATE renderer to display the created objects (kind of like the people who place the diferent sets on the stage)
+  private configureRenderer() {
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
+
   }
 
 //   // Create and add coordinates for the globe
-private addCountyCoord(state, county, cases, deaths, latitude, longitude, color){
-  let pointOfInterest = new THREE.SphereGeometry(.1, 32, 32);
-  let lat = latitude * (Math.PI/180);
-  let lon = -longitude * (Math.PI/180);
+private addCountyCoord(state, county, cases, deaths, latitude, longitude, population, color){
+  let pointOfInterest = new THREE.SphereGeometry(0.1, 32, 32);
+  let lat = latitude * (Math.PI / 180);
+  let lon = -longitude * (Math.PI / 180);
   const radius = 10;
-  const phi = (90-lat)*(Math.PI/180);
-  const theta = (lon+180)*(Math.PI/180);
+  //const phi = (90 - lat) * (Math.PI / 180);
+  //const theta = (lon + 180) * (Math.PI / 180);
 
   let material = new THREE.MeshBasicMaterial({
       color:color
@@ -184,6 +239,7 @@ private addCountyCoord(state, county, cases, deaths, latitude, longitude, color)
 
   mesh.userData.state = state;
   mesh.userData.county = county;
+  mesh.userData.population = population;
   mesh.userData.color = color;
   mesh.userData.cases = cases;
   mesh.userData.color = deaths;
@@ -204,7 +260,7 @@ private changeToCounty() {
 
   // Get the data from the JSON file
   for (let i = 0; i < this.data.length; i++){
-      this.addCountyCoord(this.data[i].state, this.data[i].county, this.data[i].cases, this.data[i].deaths, this.data[i].latitude, this.data[i].longitude, 'red');
+      this.addCountyCoord(this.data[i].state, this.data[i].county, this.data[i].cases, this.data[i].deaths, this.data[i].latitude, this.data[i].longitude, this.data[i].population ,'red');
   }
 };
 
@@ -217,5 +273,69 @@ private removeChildren(){
       this.earthClouds.remove(this.earthClouds.children[destroy])
   }
 };
+
+  // Add event listeners so DOM knows what functions to use when objects/items are interacted with
+  addListeners(){
+    window.addEventListener('resize', this.onWindowResize.bind(this), false);
+    window.addEventListener('click', this.onWindowClick.bind(this), false);
+
+  }
+
+  // Resizes the window when it changes
+private onWindowResize() {
+  this.camera.aspect = window.innerWidth / window.innerHeight;
+  this.camera.updateProjectionMatrix();
+  this.renderer.setSize(window.innerWidth, window.innerHeight);
+};
+
+// Listens for the mouse to intersect object and when clicked returns the data to the inner html
+private onWindowClick(event) {
+  event.preventDefault();
+  this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  this.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  this.raycaster.setFromCamera(this.mouse, this.camera);
+
+  let intersects = this.raycaster.intersectObjects(this.earthClouds.children);
+
+  // for (let i = 0; i < intersects.length; i++){
+  //     document.querySelector("#region").innerText = "Region: " + intersects[0].object.userData.region;
+  //     document.getElementById("region").style.color = intersects[0].object.userData.color;
+  //     document.querySelector("#country-info").innerText = "Country: " + intersects[0].object.userData.country;
+  //     document.querySelector("#language").innerText = "Language: " + intersects[0].object.userData.language;
+  //     document.querySelector("#population").innerText = "Population: " + intersects[0].object.userData.population;
+  //     document.querySelector("#area-sq-mi").innerText = "Area(mile^2): " + intersects[0].object.userData.area_sq_mi;
+  //     document.querySelector("#gdp-per-capita").innerText = "GDP Per-Capita: " + intersects[0].object.userData.gdp_per_capita;
+  //     document.querySelector("#climate").innerText = "Climate: " + intersects[0].object.userData.climate;
+  // }
+  // const item = intersects[0];
+  // let point = item.point;
+  // let camDistance = this.camera.position.copy(point).normalize().multiplyScalar(camDistance);
+};
+
+displayInstructionsBox(){
+  console.log('clicked')
+  this.showInstructionsBox = !this.showInstructionsBox;
+}
+
+  //Retrieve data from API
+private getData(){
+  this.loadindData = true;
+  this.dataService.getGlobeData().subscribe(result=>{
+
+    if (result.status == 200){
+      var tmp_data =  result.body['data'];
+      this.data = tmp_data;
+
+    }
+
+    this.loadindData = false;
+  },
+    err=>{
+
+      this.loadindData = false;
+
+    });
+
+}
 
 }
