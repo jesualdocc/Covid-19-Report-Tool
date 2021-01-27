@@ -239,3 +239,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+Backend/app/db/cases.csv
+Backend/app/db/deaths.csv
