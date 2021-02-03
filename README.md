@@ -28,7 +28,7 @@ Link to running application: https://jesualdocc.github.io/covid-app-test/
 * Delete instance/variable
 3) Go to Backend/app
 * Run app.py to start server 
-4) Go to Frontend/covidapp/src/app
+4) Go to Frontend/covidapp
 * Run “npm install” to install all dependencies
 * Run “ng serve” to start client
 * Go to browser and navigate to URL
