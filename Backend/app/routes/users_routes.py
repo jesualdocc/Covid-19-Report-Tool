@@ -20,7 +20,6 @@ from db.sql_connector import DbManagement
 from jwt_auth import token_required
 
 users_bp = Blueprint('users_bp', __name__)
-sql = DbManagement()
 
 limiter = Limiter(
     key_func=get_remote_address,
@@ -37,8 +36,9 @@ users_schema = {
         "email":{"type":"string", "format":"email"},
         "userName":{"type":"string", "minLength":5},
         "password":{"type":"string", "minLength":6},
-        "county":{"type":"string"},
-        "state":{"type":"string"}
+        "country":{"type":"string"},
+        "state":{"type":"string"},
+        "county":{"type":"string"}
     },
     "required":["userName", "password"]
 }
@@ -47,8 +47,10 @@ users_schema = {
 
 @users_bp.route('/login', methods=['POST'])
 @limiter.limit("3 per minute")
-def login():
-    global sql 
+def login(): 
+    #sqlite throws thread error if sql definedand used as global for all routes/methods
+    #would have worked fine for mysql
+    sql = DbManagement()
     result = request.json
 
     try:
@@ -59,14 +61,26 @@ def login():
         return make_response(jsonify({'message':'Invalid paramentes'}), 400)
    
     if 'userName' in result and 'password' in result:
-        user = sql.find_users(result['userName'])
+        user = None
+        i = 0
+        while True:
+            i = i + 1
+            try:
+                user = sql.find_users(result['userName'])
+                break
+            
+            except Exception as e:
+                sql.connect_to_db()
+                if i > 5:
+                    return make_response(jsonify({}), 500)
+
         if user is None:
             return jsonify({'message': 'Username or Password is incorrect'}), 401
 
         if check_password_hash(user[5], result['password']):
             #convert user tuple to dict
             user_dict = {}
-            users_table_cols = ('id', 'firstName', 'lastName', 'email', 'userName', 'password', 'county', 'state')
+            users_table_cols = ('id', 'firstName', 'lastName', 'email', 'userName', 'password', 'country','state', 'county')
             for i in range(len(users_table_cols)):
                 key = users_table_cols[i]
                 user_dict[key] = user[i] 
@@ -87,9 +101,8 @@ def login():
 @users_bp.route('/registration', methods=['POST'])
 @limiter.limit("2 per minute")
 def registration():
-    global sql
+    sql = DbManagement()
     result = request.json
-
     try:
         #Validate data from client
         validate(result, users_schema)
@@ -97,22 +110,28 @@ def registration():
     except jsonschema.ValidationError:
         return make_response(jsonify({'message':'Invalid paramentes'}), 400)
 
-    try:
-        password = result['password']
-        result['password'] = generate_password_hash(password)
-        
-        sql.add_user(result)
-        
-        return jsonify({'message': 'Succesfull'}), 201
-    except Exception as e:
-        return jsonify({'request':result}), 500
+    i = 0
+    while True:
+        i = i + 1
+        try:
+            password = result['password']
+            result['password'] = generate_password_hash(password)
+            
+            sql.add_user(result)
+            
+            return make_response(jsonify({'message': 'Succesfull'}), 201)
+
+        except Exception as e:
+            sql.connect_to_db()
+            if i > 5:
+                return make_response(jsonify({}), 500)
 
 ############################################################################
 #Update user info
 @users_bp.route('/profileinfo', methods=['PUT'])
 @token_required 
 def profile_info():
-    global sql
+    sql = DbManagement()
     result = request.json
 
     try:
@@ -123,29 +142,32 @@ def profile_info():
         return make_response(jsonify({'message':'Invalid paramentes'}), 400)
     
     if 'changeType' in request.headers:
-        if request.headers['changeType'] == 'profile':
+        i = 0
+        while True:
+            i = i + 1
+            try:
+                if request.headers['changeType'] == 'profile':
         
-            try:
-                sql.update_user(result)
+                    sql.update_user(user=result, change_password=False)
 
-                return make_response(jsonify({'message': 'Succesfull'}), 201)
-            except:
+                    return make_response(jsonify({'message': 'Succesfull'}), 201)
                 
-                return make_response(jsonify({'request':result}), 400)
-
-        #Change password only
-        if request.headers['changeType'] == 'password':
-            password = result['password']
-           
-            result['password'] = generate_password_hash(password)
-
-            try:
+                #Change password only
+                elif request.headers['changeType'] == 'password':
+                    password = result['password']
                 
-                sql.update_user(result)
+                    result['password'] = generate_password_hash(password)
+        
+                    sql.update_user(user=result, change_password=True)
 
-                return make_response(jsonify({'message': 'Succesfull'}), 201)
-            except:
-                
-                return make_response(jsonify({'request':result}), 400)
-            
+                    return make_response(jsonify({'message': 'Succesfull'}), 201)
+
+                else:
+                    return make_response(jsonify({'request':result}), 400)
+
+            except Exception as e:
+                sql.connect_to_db()
+                if i > 5:
+                    return make_response(jsonify({}), 500)
+
     return make_response(jsonify({'request':result}), 400)

@@ -5,10 +5,11 @@ import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn import linear_model
 
-
+dirname = os.path.dirname(__file__)
 class Covid_Predictor(object):
-    def __init__(self, sql_instance, county:str, state:str):
+    def __init__(self, sql_instance, country:str, state:str, county:str):
         self.sql = sql_instance
+        self.country = country
         self.county = county
         self.state = state
         self.degree_cases = 3 #10
@@ -19,12 +20,12 @@ class Covid_Predictor(object):
     def train_models(self):
       #get data
       try:
-       
-        data = self.sql.get_county_info(county=self.county, state=self.state, prediction=True)
+        
+        data = self.sql.get_info(country = self.country, state=self.state, county=self.county, prediction=True)
         
       except Exception as e:
+        print(e)
         return False
-      
       
       #Preparing data for model
       df = pd.DataFrame(data, columns=['id','cases', 'deaths'])
@@ -47,9 +48,23 @@ class Covid_Predictor(object):
       model_deaths = linear_model.LinearRegression()
       model_deaths.fit(x_deaths, y_deaths)
 
-      #Save models by unique identifier fips
-      uid = self.sql.get_uid(county=self.county, state =self.state)
-      dirname = os.path.dirname(__file__)
+      #Save models by unique identifier 
+      uid = None
+      if self.country is None:
+            uid = 'world'
+      else:
+          if '*' in self.country:
+            self.country = self.country.replace('*', '')
+
+          if self.state is None:
+                uid = self.country
+
+          else:
+                if self.county is None:
+                    uid = self.country + '_' + self.state
+                else:
+                    uid = self.country + '_' + self.state + '_' + self.county
+
       filename_c = os.path.join(dirname, f'trained_models/Cases {uid}')
       filename_d = os.path.join(dirname, f'trained_models/Deaths {uid}')
               
@@ -59,10 +74,10 @@ class Covid_Predictor(object):
 
       #Models accuracy
       accuracy_c = model_cases.score(x_cases, y_cases)
-      print(f'Model Accuracy - Cases: {round(accuracy_c*100, 3)} %')
+      #print(f'Model Accuracy - Cases: {round(accuracy_c*100, 3)} %')
 
       accuracy_d = model_deaths.score(x_deaths, y_deaths)
-      print(f'Model Accuracy - Deaths: {round(accuracy_d*100, 3)} %')
+      #print(f'Model Accuracy - Deaths: {round(accuracy_d*100, 3)} %')
 
 
   #Function to perform prediction
@@ -70,9 +85,23 @@ class Covid_Predictor(object):
       poly_features_cases = PolynomialFeatures(degree=self.degree_cases)
       poly_features_deaths = PolynomialFeatures(degree=self.degree_deaths)
 
+
       #Loading saved model
-      uid = self.sql.get_uid(county=self.county, state =self.state)
-      dirname = os.path.dirname(__file__)
+      uid = None
+      if self.country is None:
+            uid = 'world'
+      else:
+          if '*' in self.country:
+            self.country = self.country.replace('*', '')
+            
+          if self.state is None:
+                uid = self.country
+          else:
+                if self.county is None:
+                    uid = self.country + '_' + self.state
+                else:
+                    uid = self.country + '_' + self.state + '_' + self.county
+
       filename_c = os.path.join(dirname, f'trained_models/Cases {uid}')
       filename_d = os.path.join(dirname, f'trained_models/Deaths {uid}')
 
@@ -84,7 +113,7 @@ class Covid_Predictor(object):
 
       try:
         #Number of records for each county in the database
-        data = self.sql.get_county_info(county=self.county, state=self.state, prediction=True)
+        data = self.sql.get_info(country = self.country, state=self.state, county=self.county, prediction=True)
         total_count = len(data)
       except:
         return predictions

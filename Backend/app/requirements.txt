@@ -20,3 +20,4 @@ waitress
 flask-csp
 mysql-connector
 jsonschema
+python-dotenv

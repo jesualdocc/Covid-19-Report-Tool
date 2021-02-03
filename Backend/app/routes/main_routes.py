@@ -22,7 +22,6 @@ import jsonschema
 import joblib
 
 main_bp = Blueprint('main_bp', __name__)
-sql = DbManagement()
 
 #Configuring Blueprint/Routes
 config_csp = {
@@ -47,8 +46,9 @@ limiter = Limiter(
 data_schema = {
     "type": "object",
     "properties": {
-        "county": {"type": "string"},
+        "country": {"type": "string"},
         "state": {"type": "string"},
+        "county": {"type": "string"},
         "days": {"type": "integer"}
     }
 }
@@ -61,25 +61,32 @@ data_schema = {
 @limiter.limit("5 per minute")
 @csp_header(config_csp)
 def list_of_email_username():
-    global sql
+    #sqlite throws thread error if sql definedand used as global for all routes/methods
+    #would have worked fine for mysql
+    sql = DbManagement()
 
-    try:
-        users = sql.find_users()
-        users_dict = {}
-        emails = []
-        usernames = []
-        for i in range(len(users)):
+    i = 0
+    while True:
+        i = i + 1
+        try:
+            users = sql.find_users()
+            users_dict = {}
+            emails = []
+            usernames = []
+            for i in range(len(users)):
 
-            emails.append(users[i][0])
-            usernames.append(users[i][1])
+                emails.append(users[i][0])
+                usernames.append(users[i][1])
 
-        users_dict['email'] = emails
-        users_dict['userName'] = usernames
+            users_dict['email'] = emails
+            users_dict['userName'] = usernames
 
-        return make_response(jsonify({'users': users_dict}), 200)
+            return make_response(jsonify({'users': users_dict}), 200)
 
-    except:
-        return make_response(jsonify({'request': {}}), 500)
+        except:
+            sql.connect_to_db()
+            if i > 5:
+                return make_response(jsonify({'request': {}}), 500)
 
 ##############################################################################################
 
@@ -89,7 +96,7 @@ def list_of_email_username():
 @main_bp.route('/data', methods=['POST'])
 @csp_header(config_csp)
 def data():
-    global sql
+    sql = DbManagement()
     result = request.json
 
     try:
@@ -98,33 +105,52 @@ def data():
     except jsonschema.ValidationError:
         return make_response(jsonify({}), 400)
 
-    if 'county' in result and 'state' in result:
+    country = None
+    state = None
+    county = None
 
-        county = result['county']
-        state = result['state']
-        data = None
+    
+    if 'country' in result:
+        country = result['country']
 
-        if 'days' in result:
-            days = result['days']
-
-            data = sql.get_county_info(county=county, state=state, days=days)
-
-        else:
-            data = sql.get_county_info(county=county, state=state)
-
-        return make_response(jsonify({'data': data}), 200)
-
+        if 'state' in result:
+            state = result['state']
+            
+            if 'county' in result:
+                county = result['county']
+            
     else:
         return make_response(jsonify({}), 400)
 
+    data = None
+    i = 0
+    while True:
+        i = i + 1
+        try:
+            if 'days' in result:
+                days = result['days']
+
+                data = sql.get_info(country=country, state=state, county=county, days=days)  
+                
+            else:
+                data = sql.get_info(country=country, state=state, county=county)
+
+            return make_response(jsonify({'data': data}), 200)
+
+        except Exception as e:
+            sql.connect_to_db()
+            if i > 5:
+                return make_response(jsonify({}), 500)
+
+            
 #################################################################################
 
 #Returns list of counties
 
-
 @main_bp.route('/counties', methods=['POST'])
 @csp_header(config_csp)
 def get_counties():
+    sql = DbManagement()
     result = request.json
 
     try:
@@ -134,17 +160,88 @@ def get_counties():
         return make_response(jsonify({}), 400)
 
     if 'state' in result:
-        counties = sql.get_counties(result['state'])
+        i = 0
+        while True:
+            i = i + 1
+            try:
+                counties = sql.get_counties(result['state'])
 
-        if counties is not None:
-            return make_response(jsonify({'data': counties}), 200)
+                if counties is not None:
+                    return make_response(jsonify({'data': counties}), 200)
 
-        else:
-            return make_response(jsonify({}), 400)
+                else:
+                    return make_response(jsonify({}), 400)
+
+            except Exception as e:
+                sql.connect_to_db()
+                if i > 5:
+                    return make_response(jsonify({}), 500)
+
+
 
     else:
         return make_response(jsonify({}), 400)
 
+###########################################################################################
+#Returns list of states/provinces
+@main_bp.route('/states', methods=['POST'])
+@csp_header(config_csp)
+def get_states():
+    sql = DbManagement()
+    result = request.json
+
+    try:
+        #Validate data
+        validate(result, data_schema)
+    except jsonschema.ValidationError:
+       
+        return make_response(jsonify({}), 400)
+
+    states = None
+    if 'country' in result:
+        i = 0
+        while True:
+            i = i + 1
+            try:
+                if result['country'] == 'US':
+                    states = sql.get_all_state_county(states_only=True)
+
+                else:
+                    states = []
+                    tmp_states = sql.get_country_provs_states(result['country'])
+                    
+                    if len(tmp_states) > 0:
+                        for state in tmp_states:
+                            states.append(state[0])
+
+                return make_response(jsonify({'data': states}), 200)
+
+            except Exception as e:
+                sql.connect_to_db()
+                if i > 5:
+                    return make_response(jsonify({}), 500)
+                    
+    return make_response(jsonify({'request':result}), 400)
+   
+
+###########################################################################################
+
+@main_bp.route('/countries', methods=['GET'])
+@csp_header(config_csp)
+def get_countries():
+    sql = DbManagement()
+    i = 0
+    while True:
+        i = i + 1
+        try:
+            countries = sql.get_all_countries()
+
+            return make_response(jsonify({'data': countries}), 200)
+
+        except Exception as e:
+            sql.connect_to_db()
+            if i > 5:
+                return make_response(jsonify({}), 500)
 
 ###########################################################################################
 #
@@ -152,7 +249,6 @@ def get_counties():
 @token_required
 @csp_header(config_csp)
 def twitter_feed():
-    global sql
     tw = Twitter_Textblob()
     result = request.json
 
@@ -162,14 +258,25 @@ def twitter_feed():
     except jsonschema.ValidationError:
         return make_response(jsonify({}), 400)
 
-    if 'county' in result and 'state' in result:
-        county = result['county']
-        state = result['state']
+    country = None
+    state = None
+    county = None
+    geocode = []
 
-        #Todo - get geolocation from google maps data to filter tweets
-        #Not many tweets geocoded
-        #g = "37.469887, -122.0446721, 100mi"
-        geocode = []
+    if 'country' in result:
+        country = result['country']
+
+        if 'state' in result:
+            state = result['state']
+            
+            if 'county' in result:
+                county = result['county']
+
+        #Not many tweets are geocoded
+        ####sql.get_lat_lon(country=country, state=state, county=county)
+                #geocode format [lat, long, distance/radius]
+                #37.469887, -122.0446721, 100mi
+        
         #Hashtags, geocode, count
         tweets = tw.get_tweets( ['coronavirus', 'covid', 'covid19'], geocode, 20)
 
@@ -185,31 +292,55 @@ def twitter_feed():
 @token_required
 @csp_header(config_csp)
 def get_predictions():
-    global sql
+    sql = DbManagement()
     result = request.json
     days = 20
 
-    if 'county' in result and 'state' in result:
-        county = result['county']
-        state = result['state']
-        covid_predictor = Covid_Predictor(sql, county, state)
-        predictions = covid_predictor.predict(days)
+    try:
+        #Validate data
+        validate(result, data_schema)
+    except jsonschema.ValidationError:
+        return make_response(jsonify({}), 400)
 
-        return make_response(jsonify({'cases': predictions[0], 'deaths': predictions[1], 'days': days}), 200)
+    country = None
+    state = None
+    county = None
+
+    if 'country' in result:
+        country = result['country']
+
+        if 'state' in result:
+            state = result['state']
+            
+            if 'county' in result:
+                county = result['county']
 
     else:
         return make_response(jsonify({}), 400)
+    
+    i = 0
+    while True:
+        i = i + 1
+        try:
+            covid_predictor = Covid_Predictor(sql, country=country, state =state, county=county)
+            predictions = covid_predictor.predict(days)
+
+            return make_response(jsonify({'cases': predictions[0], 'deaths': predictions[1], 'days': days}), 200)
+        except Exception as e:
+            sql.connect_to_db()
+            if i > 5:
+                return make_response(jsonify({}), 500)
+    
+        
 
 ###################################################################################
 #Returns data for globe
-
 
 @main_bp.route('/globedata', methods=['GET'])
 @limiter.limit("5 per minute")
 @csp_header(config_csp)
 def get_globe_data():
-    global sql
-
+    
     try:
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'GlobeData')
