@@ -91,7 +91,7 @@ def update_globe_data():
             filename = os.path.join(dirname, 'routes/GlobeData')
             joblib.dump(data, filename) #Save data for regular use (avoid multiple db calls)
             print('-------------------------- DONE UPDADING GLOBE DATA -----------------------------')
-
+            return
         except Exception as e:
             sql.connect_to_db()
             if j > 5:
