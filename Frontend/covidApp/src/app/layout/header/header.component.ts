@@ -11,11 +11,19 @@ import { LoginService } from 'src/app/login/login.service';
 })
 export class HeaderComponent implements OnInit{
 
-  public sidebarStatus:boolean = false;
-  public pageTitle:string;
-  public homePage:boolean;
+  sidebarStatus:boolean = false;
+  pageTitle:string;
+  showMenu:boolean = false;;
   isLoggedin:boolean;
   userInfo:string;
+
+  get showLogin():boolean{
+
+    if (this.pageTitle == 'Globe'){
+      return false;
+    }
+   return true;
+  }
 
   constructor(private router: Router, private dataService:DataService,
     private loginService:LoginService) {
@@ -37,14 +45,12 @@ export class HeaderComponent implements OnInit{
 
     if(this.isLoggedin){
       var user = this.loginService.user;
-
-      this.userInfo = '(' + user['county'] + ', ' + user['state'] + ')    ';
+      //Check if it's homepage to hide/show sidemenu
+      this.showMenu = true;
+      let state = user['state'] != null ? user['state'] : '';
+      let county = user['county'] != null ? user['county'] : '';
+      this.userInfo = '(' + county + ', ' + state + ', ' + user['country'] + ')    ';
     }
-
-
-    //Check if it's homepage to hide/show sidemenu (doesnt show on homepage)
-    this.homePage = this.pageTitle == "Covid Reporting Tool" ? true : false;
-
   }
 
   login():void{
@@ -53,7 +59,7 @@ export class HeaderComponent implements OnInit{
 
   logout():void{
     this.isLoggedin = false;
-    this.homePage = true;
+    this.showMenu = false;
     this.loginService.logout();
 
   }

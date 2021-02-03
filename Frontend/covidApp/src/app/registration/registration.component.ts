@@ -1,7 +1,6 @@
-import { usStates } from './../services/States';
+
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatDialogRef } from '@angular/material/dialog';
 import {Users} from './Users';
 import { DataService } from '../services/data.service';
 
@@ -12,7 +11,8 @@ import { DataService } from '../services/data.service';
 })
 export class RegistrationComponent implements OnInit {
 
-  states = usStates;
+  countries:Set<string> =  new Set<string>();
+  states = [];
   counties = [];
   model = new Users();
   submitted = false;
@@ -22,6 +22,7 @@ export class RegistrationComponent implements OnInit {
   errorMessage = false;
   checkMatch:string = "";
   loading:boolean = false;
+  stateListEnable = false;
   countyListEnable = false;
 
   //Property that get checks in realtime
@@ -32,11 +33,8 @@ export class RegistrationComponent implements OnInit {
   }
 
   //Assures that county and states are selected (used along with form.valid)
-  get areSelected():boolean{
-    if(this.model.county == null || this.model.county == undefined || this.model.county == ""){
-      return false;
-    }
-    if(this.model.county == null || this.model.county == undefined || this.model.county == ""){
+  get isSelected():boolean{
+    if(this.model.country == null || this.model.country == undefined || this.model.country == ""){
       return false;
     }
 
@@ -59,27 +57,68 @@ export class RegistrationComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.getAll();
+    this.getCountries();
 
+  }
+
+  getCountries(){
+    this.loading = true;
+    this.dataService.getCountries().subscribe(data=>{
+      if(data.status == 200){
+        let result = data['body'].data;
+
+        this.countries.add('US');
+
+        for(var c of result){
+          this.countries.add(c[0]);
+        }
+      }
+    },
+    err=>{
+
+    },
+    ()=>{
+      this.loading = false;
+      this.getAllUsernames();
+    }
+    );
+  }
+
+  getStateProvinces(country:string){
+    this.loading = true;
+    this.states = [];
+    this.stateListEnable = false;
+    this.countyListEnable = false;
+
+    this.dataService.getStates({'country':country}).subscribe(data=>{
+      if(data.status == 200){
+        this.states = data['body'].data;
+        this.states.sort()
+      }
+
+    },err=>{},
+    ()=>{
+      this.stateListEnable = true;
+      this.loading = false;
+    });
   }
 
   getStateCounties(state:string){
     this.loading = true;
     this.counties = [];
+    this.countyListEnable = false;
+
     this.dataService.getCounties({'state':state}).subscribe(data=>{
       if(data.status == 200){
 
-        var result = data['body'].data
-        for(var i of result){
-          this.counties.push(i)
-        }
-
+        this.counties = data['body'].data
         this.counties.sort()
-        this.loading = false;
-        this.countyListEnable = true;
-      }
 
-    })
+      }
+      this.countyListEnable = true;
+      this.loading = false;
+
+    });
   }
 
   onSubmit(){
@@ -97,9 +136,9 @@ export class RegistrationComponent implements OnInit {
   }
 
 
-  getAll(){
-
-    this.dataService.getAllUsers().toPromise().then(
+  getAllUsernames(){
+    this.loading = true;
+    this.dataService.getAllUsers().subscribe(
       data=>{
 
         if(data.status == 200){
@@ -115,12 +154,13 @@ export class RegistrationComponent implements OnInit {
             this.usernameList.push(usernames[i]);
             }
         }
-      }
-    ).catch(err=>
-      {
-      console.log(err)
-    });
+      }, err=>{
 
+      },
+      ()=>{
+        this.loading = false;
+
+      });
   }
 
   sendData(){

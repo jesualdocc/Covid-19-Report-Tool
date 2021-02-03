@@ -52,9 +52,10 @@ export class SettingsComponent implements OnInit {
     this.model.lastName = data['lastName'];
     this.model.userName = data['userName'];
     this.model.email = data['email'];
-    this.model.password = data['password'];
-    this.model.county = data['county'];
+    this.model.county = data['country'];
     this.model.state = data['state'];
+    this.model.county = data['county'];
+
 }
 
 sendData(){

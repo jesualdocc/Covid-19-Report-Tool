@@ -17,6 +17,27 @@ export class TableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort:MatSort;
   location:any;
+  get tableName():string{
+
+    let name = '';
+    if (this.location['state'] != undefined){
+      console.log('Here 1')
+      if (this.location['county'] != undefined){
+        name = this.location['country'] + ', ' + this.location['state'] + ', ' + this.location['county']
+
+      }
+      else{
+
+        name = this.location['country'] + ', ' + this.location['state']
+
+      }
+
+      return name;
+    }
+
+    name = this.location['country'];
+    return name;
+  }
 
   constructor(private dataService:DataService) {
 
@@ -30,7 +51,6 @@ export class TableComponent implements OnInit {
   async requestData(){
 
     this.location = this.dataService.location;
-
       var data =  await this.dataService.getCovidData(this.location).toPromise().then(res=> {
         var data = res['body'].data;
         return data;

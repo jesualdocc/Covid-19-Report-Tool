@@ -1,11 +1,46 @@
-
+<div class="centerVH" *ngIf="loadingData">
+  <mat-spinner></mat-spinner>
+</div>
 
   <div class="mycontrols">
-    <button  class="btn mybutton">Show Locations</button>
+
+    <div style="color: white;">
+      <label style="text-align: center;" for="country" >Select Country</label>
+      <select class="form-control" id="country" [(ngModel)]="selectedCountry" name="country" #country="ngModel"(change)="addLocationData('Country')">
+        <option value="" disabled selected>Select Country </option>
+        <option *ngFor="let item of countries" [value]="item">{{item}}</option>
+      </select>
+    </div>
+
     <span style="margin-bottom: 1em;"></span>
-    <button  class="btn mybutton" (click)="setupCamera()">Reset Camera (Default View)</button>
+
+    <div style="color: white;" *ngIf="showProvincesState">
+      <label style="text-align: center;" for="province_state" >Select Province/State</label>
+      <select class="form-control" id="province_state" [(ngModel)]="selected_Province_State" name="province_state" #province_state="ngModel"(change)="addLocationData('Prov_State')">
+        <option value="" disabled selected>Select Province/State </option>
+        <option *ngFor="let item of states" [value]="item">{{item}}</option>
+      </select>
+    </div>
+
     <span style="margin-bottom: 1em;"></span>
-    <button class="btn mybutton" (click)="displayInstructionsBox()">{{buttonNameInst}}</button>
+
+    <div style="color: white;" *ngIf="showCounties">
+      <label style="text-align: center;" for="county" >Select County</label>
+      <select class="form-control" id="county" [(ngModel)]="selectedCounty" name="county" #county="ngModel"(change)="addLocationData('County')">
+        <option value="" disabled selected>Select County </option>
+        <option *ngFor="let item of counties" [value]="item">{{item}}</option>
+      </select>
+    </div>
+
+      <!-- Use a different loader, TODO - add threejs load manager -->
+    <mat-progress-bar *ngIf="changingLocationLoading" mode="indeterminate"></mat-progress-bar>
+
+    <span style="margin-bottom: 1em;"></span>
+    <button  class="btn my-button" (click)="setupCamera()">Reset Camera (Default View)</button>
+    <span style="margin-bottom: 1em;"></span>
+    <button class="btn my-button" (click)="displayInstructionsBox()">{{buttonNameInst}}</button>
+    <span style="margin-bottom: 1em;"></span>
+    <button class="btn my-button" (click)="exit()">Go to Home Page</button>
   </div>
 
 
@@ -13,7 +48,24 @@
   <div style="text-align: center;">
     <h3>INSTRUCTIONS</h3>
   </div>
-  <h3>1) Click on Show Locations</h3>
-  <h3>2) Click, Hold, and Drag mouse to rotate Globe</h3>
-  <h3>3) Click on a point to display location data</h3>
+  <h3>- Choose Location </h3>
+  <h3>- Click, Hold, and Drag mouse to rotate Globe</h3>
+  <h3>- Click on a point to display location data</h3>
+  <h3>- Zoom In/Out to point</h3>
 </div>
+
+<div class="display-data">
+
+  <h3>Country: {{myPointData.country}}</h3>
+  <h3>PROVINCE/STATE: {{myPointData.state}}</h3>
+  <h3>COUNTY: {{myPointData.county}}</h3>
+  <h3>POPULATION: {{myPointData.population}}</h3>
+  <h3>CASES: {{myPointData.cases}}</h3>
+  <h3>DEATHS: {{myPointData.deaths}}</h3>
+  <br>
+  <br>
+  <h4>-- All/Unselected (*) --</h4>
+
+</div>
+
+

@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataService } from '../services/data.service';
 import { usStates } from '../services/States';
+import * as THREE from 'three';
 import { ICovidData } from '../reports/CovidData';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -17,14 +18,17 @@ import { MatSort } from '@angular/material/sort';
 export class HomeComponent implements OnInit {
   title:string = "Covid Reporting Tool";
   model = new Users();
-  states = usStates;
+  countries:Set<string> =  new Set<string>();
+  states = [];
   counties = [];
   submitted = false;
   submissionMessage = '';
   errorMessage = false;
   loading:boolean = false;
-  countyListEnable = false;
   globeView = false;
+  data:any = null;
+  stateListEnable = false;
+  countyListEnable = false;
 
 
   constructor(private dataService:DataService, private router:Router) {
@@ -33,31 +37,68 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getCountries();
+  }
 
+
+  getCountries(){
+    this.loading = true;
+    this.dataService.getCountries().subscribe(data=>{
+      if(data.status == 200){
+        let result = data['body'].data;
+
+        this.countries.add('World');
+        this.countries.add('US');
+
+        for(var c of result){
+          this.countries.add(c[0]);
+        }
+      }
+    },
+    err=>{
+
+    },
+    ()=>{
+      this.loading = false;
+    }
+    );
+  }
+
+  getStateProvinces(country:string){
+    this.loading = true;
+    this.states = [];
+    this.stateListEnable = false;
+    this.countyListEnable = false;
+
+    this.dataService.getStates({'country':country}).subscribe(data=>{
+      if(data.status == 200){
+        this.states = data['body'].data;
+        this.states.sort()
+      }
+
+    },err=>{},
+    ()=>{
+      this.stateListEnable = true;
+      this.loading = false;
+    });
   }
 
   getStateCounties(state:string){
-
     this.loading = true;
-    this.counties = []
+    this.counties = [];
+    this.countyListEnable = false;
 
     this.dataService.getCounties({'state':state}).subscribe(data=>{
       if(data.status == 200){
 
-        var result = data['body'].data;
-        for(var i of result){
-          this.counties.push(i)
-        }
-
+        this.counties = data['body'].data
         this.counties.sort()
-        this.loading = false;
-        this.countyListEnable = true;
-      }
 
-    },
-    err=>{
-      this.submissionMessage = "An error occured... Try again ";
-    })
+      }
+      this.countyListEnable = true;
+      this.loading = false;
+
+    });
   }
 
   onSubmit(){
@@ -79,6 +120,4 @@ export class HomeComponent implements OnInit {
 
   }
 
-
 }
-

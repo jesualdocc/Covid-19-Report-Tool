@@ -1,10 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { animationFrameScheduler } from 'rxjs';
 import { DataService } from 'src/app/services/data.service';
 import * as THREE from 'three';
 //import { OrbitControls } from 'three-orbit-controls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import {IGlobeData} from './IGlobeData';
+import { IGlobeData } from './IGlobeData';
+import { ReturnStatement } from '@angular/compiler';
+import { Router } from '@angular/router';
+//import {COLORS} from './Colors';
+
+const COLORS = ['red', 'yellow', 'blue', 'green', 'purple', 'black', 'magenta', 'orange', 'gold', 'brown', 'lightgreen']
 
 @Component({
   selector: 'app-globe-threejs',
@@ -12,81 +16,112 @@ import {IGlobeData} from './IGlobeData';
   styleUrls: ['./globe-threejs.component.css'],
 })
 export class GlobeThreejsComponent implements OnInit, OnDestroy {
+  private data: IGlobeData[] = []; //holds api data
+  scene: THREE.Scene; //where objects will be placed (kind of like a stage)
+  camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight,0.1,1000);
+  renderer: THREE.WebGLRenderer; //display the created objects
+  raycaster: THREE.Raycaster; //raycaster for mouse interaction
+  mouse: THREE.Vector2; // CREATE vector2 for mouse x,y coordinates
+  lManager:THREE.LoadingManager = new THREE.LoadingManager();
 
-  private data:IGlobeData [] = []; //holds api data
-  scene:THREE.Scene; //where objects will be placed (kind of like a stage)
-  camera:THREE.PerspectiveCamera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight,0.1,1000);
-  renderer:THREE.WebGLRenderer; //display the created objects
-  raycaster:THREE.Raycaster; //raycaster for mouse interaction
-  mouse:THREE.Vector2; // CREATE vector2 for mouse x,y coordinates
-
-  earthClouds:THREE.Mesh;
+  earthClouds: THREE.Mesh;
   controls: OrbitControls;
+  loadingData: boolean = false;
+  changingLocationLoading = false;
+  disableshowLocationsButton:boolean = false;
 
-  loadindData:boolean = false;
-  showInstructionsBox:boolean = true;
-  //Change button name depending value of showInstructionsBox
-  get buttonNameInst():string{
-    return this.showInstructionsBox ? 'Hide Instructions':'Show Instructions';
+  pointData:IGlobeData;
+
+  get myPointData():IGlobeData{
+    //Shouldnt become undefined, but it prevents the app from freezing if it does
+    if(this.pointData == undefined){
+      this.pointData = {country:'*', state:'*', county:'*', cases:0, deaths:0, population:0, latitude:0, longitude:0};
+      return this.pointData;
+    }
+    else{
+      return this.pointData;
+    }
+
+  }
+  countries:Set<string> = new Set()
+  states:string[] = ['All'];
+  counties:string[] = ['All'];
+  selectedCountry:string;
+  selected_Province_State:string;
+  selectedCounty:string;
+  changePointRadiusSize = false;
+
+  get showProvincesState():boolean{
+    return this.states.length > 1;
   }
 
-  private animationId:number;
+  get showCounties():boolean{
+    return this.counties.length > 1;
+  }
 
-  constructor(private dataService:DataService) {
+  //Change buttons name depending on values
+  showInstructionsBox: boolean = true;
+  get buttonNameInst(): string {
+
+    return this.showInstructionsBox ? 'Hide Instructions' : 'Show Instructions';
+  }
+
+  private animationId: number;
+  title = 'Globe';
+
+  constructor(private dataService: DataService, private router:Router) {
+    this.dataService.changePageTitle(this.title);
     this.dataService.changeView(true);
-    this.start();
-
+    this.run();
   }
+
   ngOnDestroy(): void {
     //Stop animation and delete all objects
     cancelAnimationFrame(this.animationId);
 
     document.body.removeChild(this.renderer.domElement);
-    this.scene.clear()
-    this.renderer.dispose()
+    this.scene.clear();
+    this.renderer.dispose();
     this.camera.clear();
     this.controls.dispose();
-
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
-  start(){
-    this.getData();
-    this.createScene()
+  async run() {
+    await this.getData();
+    this.createScene();
     this.setupCamera();
     this.setupMouseInteractivity();
     this.configureRenderer();
-    this.addListeners()
     this.createEarth();
+    this.addListeners();
     this.setupControls();
 
-    this.animate()
+    this.animate();
   }
 
   // Allows for the scene to move and be interacted with
-  animate(){
+  animate() {
     this.animationId = requestAnimationFrame(this.animate.bind(this));
     this.renderer.render(this.scene, this.camera);
     this.controls.update();
   }
 
-  private createScene(){
+  private createScene() {
     //where objects will be placed (kind of like a stage)
     this.scene = new THREE.Scene();
   }
 
   setupCamera() {
-
     // Change position so we can see the objects (change x, y for default country/continent view)
     this.camera.position.x = -3.5;
     this.camera.position.y = 13.5;
-    this.camera.position.z = 15;
+    this.camera.position.z = 10;
     //Returns camera to default settings
   }
 
-
-  private setupControls(){
+  private setupControls() {
     // CREATE controls so that we can interact with the objects/have interactivity
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
@@ -96,18 +131,18 @@ export class GlobeThreejsComponent implements OnInit, OnDestroy {
     this.controls.enablePan = false;
     this.controls.update();
     this.controls.saveState();
-
   }
 
-  private setupMouseInteractivity(){
+  private setupMouseInteractivity() {
     this.raycaster = new THREE.Raycaster(); //raycaster for mouse interaction
     this.mouse = new THREE.Vector2(); // CREATE vector2 for mouse x,y coordinates
   }
 
-
   private createEarth() {
     // Earthmap is used for the basic texture which has the various continents/countries/etc. on it
-    let earthMap = new THREE.TextureLoader().load('assets/myglobe_images/earthmap4k.jpg');
+    let earthMap = new THREE.TextureLoader().load(
+      'assets/myglobe_images/earthmap4k.jpg'
+    );
 
     // EarthBumpMap is used to give the texture some "depth" so it is more appealing on eyes and data visuals
     let earthBumpMap = new THREE.TextureLoader().load(
@@ -134,10 +169,10 @@ export class GlobeThreejsComponent implements OnInit, OnDestroy {
     // Earth is the final product which ends up being rendered on scene, also is used as a grandparent for the points of interest
     let earth = new THREE.Mesh(earthGeometry, earthMaterial);
 
-    this.earthClouds = this.createCloudTextures()
-    earth.add(this.earthClouds); //Add clouds to earth
+    this.createCloudTextures(); //Add clouds to earth
+    earth.add(this.earthClouds);
 
-     //Add earth to the scene
+    //Add earth to the scene
     this.scene.add(earth);
 
     this.createSkyBox();
@@ -146,6 +181,7 @@ export class GlobeThreejsComponent implements OnInit, OnDestroy {
   }
 
   private createCloudTextures() {
+    return new Promise((resolve, reject) => {
     // Add clouds to the earth object
     let earthCloudGeo = new THREE.SphereGeometry(10, 32, 32);
 
@@ -163,12 +199,13 @@ export class GlobeThreejsComponent implements OnInit, OnDestroy {
     });
 
     // Create final texture for clouds
-    let earthClouds = new THREE.Mesh(earthCloudGeo, earthMaterialClouds);
+    this.earthClouds = new THREE.Mesh(earthCloudGeo, earthMaterialClouds);
 
     // Scale above the earth sphere mesh
-    earthClouds.scale.set(1.015, 1.015, 1.015);
+    this.earthClouds.scale.set(1.015, 1.015, 1.015);
 
-    return earthClouds;
+    resolve(true);
+  });
   }
 
   private createSkyBox() {
@@ -203,139 +240,322 @@ export class GlobeThreejsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   private configureRenderer() {
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
-
   }
 
-//   // Create and add coordinates for the globe
-private addCountyCoord(state, county, cases, deaths, latitude, longitude, population, color){
-  let pointOfInterest = new THREE.SphereGeometry(0.1, 32, 32);
-  let lat = latitude * (Math.PI / 180);
-  let lon = -longitude * (Math.PI / 180);
-  const radius = 10;
-  //const phi = (90 - lat) * (Math.PI / 180);
-  //const theta = (lon + 180) * (Math.PI / 180);
+  //   // Create and add coordinates for the globe
+  private addCountyCoord(
+    country,
+    state,
+    county,
+    cases,
+    deaths,
+    latitude,
+    longitude,
+    population,
+    color
+  ) {
 
-  let material = new THREE.MeshBasicMaterial({
-      color:color
-  });
+    //0.035 for counties only
+    let sphereRadiusSize:number = this.changePointRadiusSize ? 0.035:0.1;
+    let pointOfInterest = new THREE.SphereGeometry(sphereRadiusSize, 32, 32);
+    let lat = latitude * (Math.PI / 180);
+    let lon = -longitude * (Math.PI / 180);
+    const radius = 10;
 
-  let mesh = new THREE.Mesh(
-      pointOfInterest,
-      material
-  );
 
-  mesh.position.set(
+    let material = new THREE.MeshBasicMaterial({
+      color: color,
+    });
+
+    let mesh = new THREE.Mesh(pointOfInterest, material);
+
+    mesh.position.set(
       Math.cos(lat) * Math.cos(lon) * radius,
       Math.sin(lat) * radius,
       Math.cos(lat) * Math.sin(lon) * radius
-  );
+    );
 
-  mesh.rotation.set(0.0, -lon, lat-Math.PI*0.5);
+    mesh.rotation.set(0.0, -lon, lat - Math.PI * 0.5);
 
-  mesh.userData.state = state;
-  mesh.userData.county = county;
-  mesh.userData.population = population;
-  mesh.userData.color = color;
-  mesh.userData.cases = cases;
-  mesh.userData.color = deaths;
+    mesh.userData.country = country;
+    mesh.userData.state = state;
+    mesh.userData.county = county;
+    mesh.userData.population = population;
+    mesh.userData.color = color;
+    mesh.userData.cases = cases;
+    mesh.userData.deaths = deaths;
 
-
-  this.earthClouds.add(mesh)
-
-};
-
-// Changes the information so data points can be seen
-private changeToCounty() {
-  // Show/hide needed and unneeded elements
-  //document.querySelector("#instruction-box").style.display = "none";
-  document.getElementById("title-box").style.display = "none";
-  document.getElementById("info-box").style.display = "flex";
-
-  this.removeChildren();
-
-  // Get the data from the JSON file
-  for (let i = 0; i < this.data.length; i++){
-      this.addCountyCoord(this.data[i].state, this.data[i].county, this.data[i].cases, this.data[i].deaths, this.data[i].latitude, this.data[i].longitude, this.data[i].population ,'red');
+    this.earthClouds.add(mesh);
   }
-};
+
+  // Changes the information so data points can be seen
+  addLocationData(type:string) {
+          this.changingLocationLoading = true;
+          var filteredData:IGlobeData[] = this.data.filter(data=> data.country == this.selectedCountry);
+          this.changePointRadiusSize = false;
+          this.removeChildren();
+
+          if(type == 'Country'){
+
+              this.counties = ['All'];
+              this.states = ['All'];
+              if(this.selectedCountry == 'US'){
+
+                //Filter further to avoid slowing dow browser since there is a lot of data for the US
+                this.updateDisplayBoard(filteredData, type);
+
+                //Include one county per state for mapping points on globe - representing state points
+                var tmp:IGlobeData[] = [];
+                let statesAdded:string[] = [];
+                for(let i = 0; i < filteredData.length; i++){
+
+                  if(!statesAdded.includes(filteredData[i].state)){
+                    statesAdded.push(filteredData[i].state);
+                    tmp.push(filteredData[i]);
+                  }
+                }
+                let tmpArr = ['All'].concat(statesAdded.sort());
+                this.states =  tmpArr;
+                filteredData = tmp;
+
+              }
+              else{
+
+                this.updateDisplayBoard(filteredData, type);
+
+                if(this.selectedCountry == 'World'){
+                  //Show all countries points
+                  filteredData = this.data.filter(data=> data.state == null || data.state == '*');
+
+                }
+                else{
+
+                  for(let i = 0; i < filteredData.length; i++){
+                    if(filteredData[i].state != null){
+                      this.states.push(filteredData[i].state)
+                    }
+                  }
+                }
+              }
+              this.selected_Province_State == null;
+          }
+
+        else if(type == 'Prov_State'){
+            this.selectedCounty = null;
+            this.counties = ['All'];
+
+              if(this.selected_Province_State != 'All' && this.selected_Province_State != null){
+                filteredData = this.data.filter(data=> data.state == this.selected_Province_State);
+                this.updateDisplayBoard(filteredData, type);
+
+                if(this.selectedCountry == 'US'){
+                  this.updateTotals(filteredData);
+                  this.changePointRadiusSize = true;
+                }
+              }
+              else{
+                this.changePointRadiusSize = false;
+                this.updateDisplayBoard(filteredData, type);
+              }
+        }
+        else{
+           //County Data
+
+          if(this.selected_Province_State != 'All' && this.selected_Province_State != null){
+
+            filteredData = this.data.filter(data=> data.state == this.selected_Province_State);
+          }
+
+              if(this.selectedCounty != 'All' && this.selectedCounty != null){
+                this.changePointRadiusSize = false;
+                filteredData = filteredData.filter(data=> data.county == this.selectedCounty);
+                this.updateDisplayBoard(filteredData, type);
+
+              }
+
+              else{
+
+                this.counties = ['All'];
+                this.changePointRadiusSize = true;
+                this.updateTotals(filteredData);
+              }
+          }
+        this.removeBlanksandSymbols();
+        //console.log(filteredData)
+      // Insert data  into the globe (points)
+        let numOfColors = COLORS.length;
+        for (let i = 0, colorIndex = 0; i < filteredData.length; i++, colorIndex++) {
+
+          if(colorIndex == numOfColors){
+            colorIndex = 0; //Repeat colors if list of colors if less than data points
+          }
+          //COLOR[colorIndex] - gives different colors to each point
+          this.addCountyCoord(filteredData[i].country, filteredData[i].state, filteredData[i].county, filteredData[i].cases, filteredData[i].deaths, filteredData[i].latitude, filteredData[i].longitude, filteredData[i].population, COLORS[colorIndex]);
+
+        }
+
+        this.changingLocationLoading = false;
+  }
+
+  //Updated display info without click on globe
+  private updateDisplayBoard(filteredData:IGlobeData[], type:string){
+    if(type == 'Country'){
+      filteredData = filteredData.filter(data=> data.state == null || data.state == '*');
+      this.pointData = filteredData[0];
+      this.pointData.state = '*';
+      this.pointData.county = '*';
+    }
+    else if(type == 'Prov_State'){
+      this.pointData = filteredData[0];
+      this.pointData.county = '*';
+    }
+    else{
+      this.pointData = filteredData[0];
+    }
+
+  }
+
+  private removeBlanksandSymbols(){
+    let index = this.states.indexOf('*');
+    if (index > -1) {
+      this.states.splice(index, 1);
+    }
+
+    index = this.states.indexOf('');
+    if (index > -1) {
+      this.states.splice(index, 1);
+    }
+
+    index = this.states.indexOf(' ');
+    if (index > -1) {
+      this.states.splice(index, 1);
+    }
+
+    index = this.counties.indexOf('*');
+    if (index > -1) {
+      this.counties.splice(index, 1);
+    }
+
+    index = this.counties.indexOf('');
+    if (index > -1) {
+      this.counties.splice(index, 1);
+    }
+
+    index = this.counties.indexOf(' ');
+    if (index > -1) {
+      this.counties.splice(index, 1);
+    }
+
+  }
+
+  //Updates totals by state to be displayed when a state is chosen
+  private updateTotals(filteredData:IGlobeData[]){
+              let totalCases = 0;
+              let totalDeaths = 0;
+              let totalPopulation = 0;
+
+              for(let i = 0; i < filteredData.length; i++){
+                this.counties.push(filteredData[i].county)
+                totalCases += filteredData[i].cases;
+                totalDeaths += filteredData[i].deaths;
+                totalPopulation += filteredData[i].population;
+              }
+              //State/Province data
+              this.pointData.country = this.selectedCountry;
+              this.pointData.state = this.selected_Province_State;
+              this.pointData.cases = totalCases;
+              this.pointData.deaths = totalDeaths;
+              this.pointData.population = totalPopulation;
+              this.pointData.county = '*';
+
+  }
 
   // Removes the points of interest freeing up memory and space to have better performance
-private removeChildren(){
-  let destroy = this.earthClouds.children.length;
-  while(destroy--) {
+  private removeChildren() {
+    let destroy = this.earthClouds.children.length;
+    while (destroy--) {
       //this.earthClouds.remove(this.earthClouds.children[destroy].material.dispose())
       //this.earthClouds.remove(this.earthClouds.children[destroy].geometry.dispose())
-      this.earthClouds.remove(this.earthClouds.children[destroy])
+      this.earthClouds.remove(this.earthClouds.children[destroy]);
+    }
   }
-};
 
   // Add event listeners so DOM knows what functions to use when objects/items are interacted with
-  addListeners(){
+  addListeners() {
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
     window.addEventListener('click', this.onWindowClick.bind(this), false);
-
   }
 
   // Resizes the window when it changes
-private onWindowResize() {
-  this.camera.aspect = window.innerWidth / window.innerHeight;
-  this.camera.updateProjectionMatrix();
-  this.renderer.setSize(window.innerWidth, window.innerHeight);
-};
+  private onWindowResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
-// Listens for the mouse to intersect object and when clicked returns the data to the inner html
-private onWindowClick(event) {
-  event.preventDefault();
-  this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  this.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-  this.raycaster.setFromCamera(this.mouse, this.camera);
+  // Listens for the mouse to intersect object and when clicked returns the data to the inner html
+  private onWindowClick(event) {
+    event.preventDefault();
+    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    this.raycaster.setFromCamera(this.mouse, this.camera);
 
-  let intersects = this.raycaster.intersectObjects(this.earthClouds.children);
+    let intersects = this.raycaster.intersectObjects(this.earthClouds.children);
+    if(intersects[0] != undefined){
 
-  // for (let i = 0; i < intersects.length; i++){
-  //     document.querySelector("#region").innerText = "Region: " + intersects[0].object.userData.region;
-  //     document.getElementById("region").style.color = intersects[0].object.userData.color;
-  //     document.querySelector("#country-info").innerText = "Country: " + intersects[0].object.userData.country;
-  //     document.querySelector("#language").innerText = "Language: " + intersects[0].object.userData.language;
-  //     document.querySelector("#population").innerText = "Population: " + intersects[0].object.userData.population;
-  //     document.querySelector("#area-sq-mi").innerText = "Area(mile^2): " + intersects[0].object.userData.area_sq_mi;
-  //     document.querySelector("#gdp-per-capita").innerText = "GDP Per-Capita: " + intersects[0].object.userData.gdp_per_capita;
-  //     document.querySelector("#climate").innerText = "Climate: " + intersects[0].object.userData.climate;
-  // }
-  // const item = intersects[0];
-  // let point = item.point;
-  // let camDistance = this.camera.position.copy(point).normalize().multiplyScalar(camDistance);
-};
-
-displayInstructionsBox(){
-  console.log('clicked')
-  this.showInstructionsBox = !this.showInstructionsBox;
-}
-
-  //Retrieve data from API
-private getData(){
-  this.loadindData = true;
-  this.dataService.getGlobeData().subscribe(result=>{
-
-    if (result.status == 200){
-      var tmp_data =  result.body['data'];
-      this.data = tmp_data;
+      var tmpData:any = intersects[0].object.userData;
+      this.pointData = tmpData;
+      let point = intersects[0].point;
+      this.camera.position.copy(point).normalize(); //move camera a bit closer to point selected
 
     }
 
-    this.loadindData = false;
-  },
-    err=>{
+  }
 
-      this.loadindData = false;
+  //Toggles instruction box
+  displayInstructionsBox() {
+    this.showInstructionsBox = !this.showInstructionsBox;
+  }
+exit(){
 
-    });
+  this.router.navigate(['home']).then(()=>{
+    //Reloads application to better display the other pages without being affected by threejs
+    window.location.reload();
+  });
 
 }
+  //Retrieve data from API
+  private getData() {
+    return new Promise((resolve, reject) => {
+      this.loadingData = true;
+      this.dataService.getGlobeData().subscribe(
+        (result) => {
+          if (result.status == 200) {
+            this.data = result.body['data'];
+          }
+
+          this.countries.add('World');
+          this.countries.add('US');
+          for(let i = 0; i < this.data.length; i++){
+            this.countries.add(this.data[i].country)
+          }
+
+        },
+        (err) => {
+          reject(false)
+        },
+
+        () => {
+          //Resolve when complete
+          this.loadingData = false;
+          resolve(true);
+        }
+      );
+    });
+  }
 
 }

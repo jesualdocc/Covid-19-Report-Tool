@@ -19,6 +19,7 @@ export class CovidtableComponent implements AfterViewInit {
   dataSource:MatTableDataSource<ICovidData>;
   response:any;
   loading:boolean = false;
+  data:any;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort:MatSort;
@@ -50,22 +51,28 @@ export class CovidtableComponent implements AfterViewInit {
     }
   }
 
-  async requestData(days:number){
+  requestData(days:number){
     this.loading = true;
     var user = this.loginService.user;
     user['days'] = days;
 
-      var data =  await this.dataService.getCovidData(user).toPromise().then(res=> {
-        var data = res['body'].data;
-        return data;
+      this.dataService.getCovidData(user).subscribe(res=>{
+        this.data = res['body'].data;
+
+      }, err=>{
+
+      },
+      ()=>{
+
+        var tableData = this.formatData(this.data);
+        this.dataSource = new MatTableDataSource<ICovidData>(tableData);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        this.loading = false;
       });
 
-    var tableData = this.formatData(data);
 
-    this.dataSource = new MatTableDataSource<ICovidData>(tableData);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.loading = false;
+
   }
 
 

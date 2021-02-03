@@ -1,12 +1,10 @@
-import { DataService } from './../services/data.service';
-import { ILogin} from './login';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { baseUrl, baseTestingUrl } from './../../environments/environment';
 import { Observable } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
 import { Router } from '@angular/router';
-import { Users } from '../registration/Users';
+
 
 @Injectable({
   providedIn: 'root'

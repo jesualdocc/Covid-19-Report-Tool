@@ -6,7 +6,7 @@ export const environment = {
   production: false
 };
 
-export const baseUrl = 'http://localhost:8000'; //'https://serverflask.azurewebsites.net';
+export const baseUrl = 'http://localhost:8000'; //Server
 export const baseUrlAngular = 'http://localhost:4200';
 export const baseTestingUrl = 'http://localhost:8000';
 

@@ -58,7 +58,7 @@ currentPageTitle = this.pageTitle.asObservable();
     return this.http.post<any>(url, user, httpOptions)
   }
 
-  getCounties(state:any):Observable<any>{
+  getCounties(location:any):Observable<any>{
 
     var url = this.mainRoute + '/counties';
     var httpOptions = {
@@ -69,7 +69,35 @@ currentPageTitle = this.pageTitle.asObservable();
       })
     }
 
-    return this.http.post(url,state, httpOptions);
+    return this.http.post(url,location, httpOptions);
+  }
+
+  getCountries():Observable<any>{
+
+    var url = this.mainRoute + '/countries';
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({
+        'Content-Type':'application/json'
+      })
+    }
+
+    return this.http.get(url, httpOptions);
+  }
+
+  getStates(country:any):Observable<any>{
+
+    var url = this.mainRoute + '/states';
+    var httpOptions = {
+      observe : 'response' as const,
+      responseType:'json' as const,
+      headers: new HttpHeaders({
+        'Content-Type':'application/json'
+      })
+    }
+
+    return this.http.post(url,country, httpOptions);
   }
 
   getAllUsers():Observable<any>{

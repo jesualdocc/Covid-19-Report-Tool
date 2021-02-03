@@ -5,7 +5,8 @@ export class Users{
   email:string;
   userName:string;
   password:string;
-  county:string;
+  country:string;
   state:string;
+  county:string;
   days:number;
 }

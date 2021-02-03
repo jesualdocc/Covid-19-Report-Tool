@@ -13,46 +13,25 @@ import { usStates } from '../services/States';
 })
 export class ProfileinformationComponent implements OnInit {
 
-  states = usStates;
+  countries:Set<string> =  new Set<string>();
+  states = [];
   counties = [];
   model = new Users();
   submitted = false;
   submissionMessage = '';
   errorMessage = false;
   loading:boolean = false;
-  countyListEnable = true;
+  stateListEnable = false;
+  countyListEnable = false;
 
   constructor(private dataService:DataService, private router:Router, private loginService:LoginService) { }
 
   ngOnInit(): void {
     this.getUser();
-    this.getStateCounties(this.model.state, 0)
+    this.getCountries();
+    //this.getStateProvinces(this.model.state, 0);
+    //this.getStateCounties(this.model.county, 0);
 
-  }
-
-  getStateCounties(state:string, change:number){
-    //0 - No change, 1- Change
-    this.loading = true;
-
-    if(change){
-      this.countyListEnable = false;
-      this.counties = []
-    }
-
-    this.dataService.getCounties({'state':state}).subscribe(data=>{
-      if(data.status == 200){
-
-        var result = data['body'].data
-        for(var i of result){
-          this.counties.push(i)
-        }
-
-        this.counties.sort()
-        this.loading = false;
-        this.countyListEnable = true;
-      }
-
-    })
   }
 
   getUser(){
@@ -63,9 +42,9 @@ export class ProfileinformationComponent implements OnInit {
       this.model.lastName = data['lastName'];
       this.model.userName = data['userName'];
       this.model.email = data['email'];
-      this.model.password = data['password'];
-      this.model.county = data['county'];
+      this.model.country = data['country'];
       this.model.state = data['state'];
+      this.model.county = data['county'];
   }
 
   onSubmit(){
@@ -98,6 +77,72 @@ export class ProfileinformationComponent implements OnInit {
    }
    );
   }
+
+  getCountries(){
+    this.loading = true;
+    this.dataService.getCountries().subscribe(data=>{
+      if(data.status == 200){
+        let result = data['body'].data;
+
+        this.countries.add('US');
+
+        for(var c of result){
+          this.countries.add(c[0]);
+        }
+      }
+    },
+    err=>{
+
+    },
+    ()=>{
+      this.loading = false;
+    }
+    );
+  }
+
+  getStateProvinces(country:string, change:number){
+    this.loading = true;
+    if(change){
+      this.states = [];
+      this.stateListEnable = false;
+      this.countyListEnable = false;
+    }
+
+    this.dataService.getStates({'country':country}).subscribe(data=>{
+      if(data.status == 200){
+        this.states = data['body'].data;
+        this.states.sort()
+      }
+
+    },err=>{},
+    ()=>{
+      this.stateListEnable = true;
+      this.loading = false;
+    });
+  }
+
+  getStateCounties(state:string, change:number){
+    this.loading = true;
+
+    if(change){
+      this.counties = [];
+      this.countyListEnable = false;
+    }
+
+    this.dataService.getCounties({'state':state}).subscribe(data=>{
+      if(data.status == 200){
+
+        this.counties = data['body'].data
+        this.counties.sort()
+
+      }
+      this.countyListEnable = true;
+      this.loading = false;
+
+    });
+  }
+
+
 
 }
 
