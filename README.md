@@ -3,7 +3,7 @@
 Link to running application: https://jesualdocc.github.io/covid-app-test/
 
 ## Features
-* Daily Covid-19 reports (World, countries, *states/provinces, *counties)
+* Daily Covid-19 reports (World, countries, *states/provinces, territories*, *counties)
 * Predictions (cases, deaths)
 * Tweet sentiment analysis
 
