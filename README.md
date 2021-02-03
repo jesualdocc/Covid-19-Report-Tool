@@ -15,10 +15,10 @@ Link to the running app: https://jesualdocc.github.io/covid-app-test/
 
 1) Go Backend/app
 
-*Run “pip install -r requirements.txt” to install all dependencies
+* Run “pip install -r requirements.txt” to install all dependencies
 
 2) Go Backend/app/db
-*Open sql_conector.py
+* Open sql_conector.py
 *Instantiate a DbManagement instance (*choose between the default sqlite, and MySQL)
 *Run function initial_set_up() to setup all tables and data in the db
 *Delete instance
