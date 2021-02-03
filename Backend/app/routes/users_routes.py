@@ -33,7 +33,6 @@ users_schema = {
         "id":{"type":"integer"},
         "firstName":{"type":"string", "maxLength": 44},
         "lastName":{"type":"string", "maxLength":44},
-        "email":{"type":"string", "format":"email"},
         "userName":{"type":"string", "minLength":5},
         "password":{"type":"string", "minLength":6},
         "country":{"type":"string"},
@@ -80,7 +79,7 @@ def login():
         if check_password_hash(user[5], result['password']):
             #convert user tuple to dict
             user_dict = {}
-            users_table_cols = ('id', 'firstName', 'lastName', 'email', 'userName', 'password', 'country','state', 'county')
+            users_table_cols = ('id', 'firstName', 'lastName', 'userName', 'password', 'country','state', 'county')
             for i in range(len(users_table_cols)):
                 key = users_table_cols[i]
                 user_dict[key] = user[i] 

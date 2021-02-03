@@ -17,7 +17,6 @@ export class RegistrationComponent implements OnInit {
   model = new Users();
   submitted = false;
   submissionMessage = '';
-  emailList:string[] = [];
   usernameList:string[] = [];
   errorMessage = false;
   checkMatch:string = "";
@@ -144,13 +143,10 @@ export class RegistrationComponent implements OnInit {
         if(data.status == 200){
           var result = data['body'].users;
 
-          var emails = result['email'];
-
           var usernames = result['userName'];
 
-            for(var i in emails){
+            for(var i in usernames){
 
-            this.emailList.push(emails[i]);
             this.usernameList.push(usernames[i]);
             }
         }

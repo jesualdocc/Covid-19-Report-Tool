@@ -53,14 +53,13 @@ data_schema = {
     }
 }
 
-
 ###################################################################################
 
 #Retrieves list of email and usernames already registered
 @main_bp.route('/listof', methods=['GET'])
 @limiter.limit("5 per minute")
 @csp_header(config_csp)
-def list_of_email_username():
+def list_of_username():
     #sqlite throws thread error if sql definedand used as global for all routes/methods
     #would have worked fine for mysql
     sql = DbManagement()
@@ -71,14 +70,11 @@ def list_of_email_username():
         try:
             users = sql.find_users()
             users_dict = {}
-            emails = []
             usernames = []
             for i in range(len(users)):
 
-                emails.append(users[i][0])
                 usernames.append(users[i][1])
 
-            users_dict['email'] = emails
             users_dict['userName'] = usernames
 
             return make_response(jsonify({'users': users_dict}), 200)

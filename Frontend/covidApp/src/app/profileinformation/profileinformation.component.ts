@@ -3,8 +3,6 @@ import { DataService } from 'src/app/services/data.service';
 import { Component, OnInit } from '@angular/core';
 import { Users } from 'src/app/registration/Users';
 import { Router } from '@angular/router';
-import { usStates } from '../services/States';
-
 
 @Component({
   selector: 'app-profileinformation',
@@ -41,7 +39,6 @@ export class ProfileinformationComponent implements OnInit {
       this.model.firstName = data['firstName'];
       this.model.lastName = data['lastName'];
       this.model.userName = data['userName'];
-      this.model.email = data['email'];
       this.model.country = data['country'];
       this.model.state = data['state'];
       this.model.county = data['county'];

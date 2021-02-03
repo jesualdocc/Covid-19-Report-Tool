@@ -601,7 +601,7 @@ class DbManagement(object):
         while True:
             try:
                 DbManagement.cursor.execute("DROP TABLE IF EXISTS " + "users")
-                sql = "CREATE TABLE "+ "users " + f"(id INTEGER PRIMARY KEY {self.AUTO_INCREMENT},firstName VARCHAR(45) NOT NULL, lastName VARCHAR(45) NOT NULL,email VARCHAR(45) NOT NULL,userName VARCHAR(45) NOT NULL UNIQUE, password VARCHAR(200) NOT NULL,country VARCHAR(45) NOT NULL, state VARCHAR(45) NULL, county VARCHAR(45) NULL);"
+                sql = "CREATE TABLE "+ "users " + f"(id INTEGER PRIMARY KEY {self.AUTO_INCREMENT},firstName VARCHAR(45) NOT NULL, lastName VARCHAR(45) NOT NULL,userName VARCHAR(45) NOT NULL UNIQUE, password VARCHAR(200) NOT NULL,country VARCHAR(45) NOT NULL, state VARCHAR(45) NULL, county VARCHAR(45) NULL);"
                 DbManagement.cursor.execute(sql)
                 break
 
@@ -613,7 +613,7 @@ class DbManagement(object):
         #Function to retrieve users from db (all and by id)
         if username is None:
             #Returns list of usernames and emails already registered
-            query = "SELECT email, userName FROM users"
+            query = "SELECT userName FROM users"
 
             while True:
                 try:
@@ -640,8 +640,8 @@ class DbManagement(object):
     
     def add_user(self, user:dict):
         #Function to add new user
-        query = "INSERT INTO `users` (`firstName`, `lastName`, `email`, `userName`, `password`,`country`, `state`, `county`) "
-        values = f"VALUES ('{user['firstName']}', '{user['lastName']}', '{user['email']}', '{user['userName']}', '{user['password']}','{user['country']}', '{user['state']}', '{user['county']}'); "
+        query = "INSERT INTO `users` (`firstName`, `lastName`, `userName`, `password`,`country`, `state`, `county`) "
+        values = f"VALUES ('{user['firstName']}', '{user['lastName']}',{user['userName']}', '{user['password']}','{user['country']}', '{user['state']}', '{user['county']}'); "
         
         while True:
             try:
@@ -654,7 +654,7 @@ class DbManagement(object):
 
     def update_user(self, user:dict, change_password = False):
         #Function to updater user info
-        query = f"UPDATE users SET firstName='{user['firstName']}', lastName= '{user['lastName']}', email='{user['email']}', country='{user['country']}',"
+        query = f"UPDATE users SET firstName='{user['firstName']}', lastName= '{user['lastName']}', country='{user['country']}',"
         
         query_cont = None
         
