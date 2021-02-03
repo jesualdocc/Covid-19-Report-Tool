@@ -15,16 +15,16 @@ Link to the running app: https://jesualdocc.github.io/covid-app-test/
 
 1) Go Backend/app
 
-a. Run “pip install -r requirements.txt” to install all dependencies
+*Run “pip install -r requirements.txt” to install all dependencies
 
 2) Go Backend/app/db
-a. Open sql_conector.py
-b. Instantiate a DbManagement instance (*choose between the default sqlite, and MySQL)
-c. Run function initial_set_up() to setup all tables and data in the db
-d. Delete instance
+*Open sql_conector.py
+*Instantiate a DbManagement instance (*choose between the default sqlite, and MySQL)
+*Run function initial_set_up() to setup all tables and data in the db
+*Delete instance
 3) Go Backend/app
-a. Run app.py to start server
+*Run app.py to start server
 4) Go to Frontend/covidapp/src/app
-a. Run “npm install” to install all dependencies
-b. Run “ng serve” to start client
-c. Go to browser and navigate to URL
+*Run “npm install” to install all dependencies
+*Run “ng serve” to start client
+*Go to browser and navigate to URL
