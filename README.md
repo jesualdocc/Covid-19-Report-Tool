@@ -14,17 +14,16 @@ Link to the running app: https://jesualdocc.github.io/covid-app-test/
 ##How to run app locally
 
 1) Go Backend/app
-
 * Run “pip install -r requirements.txt” to install all dependencies
-
+* Rename configEx.py to config.py, and fill the empty fields (DB info, JWT secret key,and Twitter API Keys if needed)
 2) Go Backend/app/db
 * Open sql_conector.py
-*Instantiate a DbManagement instance (*choose between the default sqlite, and MySQL)
-*Run function initial_set_up() to setup all tables and data in the db
-*Delete instance
+* Instantiate a DbManagement instance (*choose between the default sqlite, and MySQL)
+* Run function initial_set_up() to setup all tables and data in the db
+* Delete instance
 3) Go Backend/app
-*Run app.py to start server
+* Run app.py to start server
 4) Go to Frontend/covidapp/src/app
-*Run “npm install” to install all dependencies
-*Run “ng serve” to start client
-*Go to browser and navigate to URL
+* Run “npm install” to install all dependencies
+* Run “ng serve” to start client
+* Go to browser and navigate to URL
