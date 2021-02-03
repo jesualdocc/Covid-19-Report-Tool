@@ -51,7 +51,6 @@ export class SettingsComponent implements OnInit {
     this.model.firstName = data['firstName'];
     this.model.lastName = data['lastName'];
     this.model.userName = data['userName'];
-    this.model.email = data['email'];
     this.model.county = data['country'];
     this.model.state = data['state'];
     this.model.county = data['county'];

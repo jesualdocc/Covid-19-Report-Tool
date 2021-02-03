@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
-import { baseUrl, baseTestingUrl } from './../../environments/environment';
+//import { baseUrl, baseTestingUrl } from './../../environments/environment';
 import { Observable } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ token:string;
 isLoggedIn:boolean;
 headers:HttpHeaders;
 user:any;
+baseUrl = 'https://jesualdocc.pythonanywhere.com';
 
   constructor(private http:HttpClient, private localStorage:LocalStorageService,
      private router:Router) {
@@ -25,7 +26,7 @@ user:any;
       observe : 'response' as const,
       responseType:'json' as const
     }
-    return this.http.post<any>(baseUrl +'/login', data, httpOptions);
+    return this.http.post<any>(this.baseUrl +'/login', data, httpOptions);
   }
 
   getToken():string{

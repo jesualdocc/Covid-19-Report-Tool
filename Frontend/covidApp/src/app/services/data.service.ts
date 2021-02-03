@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
 import { Users } from '../registration/Users';
 import { ICovidData } from '../reports/CovidData';
-import { baseUrl, baseTestingUrl } from './../../environments/environment';
+//import { baseUrl, baseTestingUrl } from './../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,7 @@ private pageTitle = new BehaviorSubject("");
 currentPageTitle = this.pageTitle.asObservable();
 
   constructor(private http:HttpClient, private loginService:LoginService) {
-    this.mainRoute = baseUrl;
+    this.mainRoute = 'https://jesualdocc.pythonanywhere.com';
   }
 
   showSideBar(status:boolean){
