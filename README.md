@@ -14,7 +14,9 @@ Link to the running app: https://jesualdocc.github.io/covid-app-test/
 ##How to run app locally
 
 1) Go Backend/app
+
 a. Run “pip install -r requirements.txt” to install all dependencies
+
 2) Go Backend/app/db
 a. Open sql_conector.py
 b. Instantiate a DbManagement instance (*choose between the default sqlite, and MySQL)
