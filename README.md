@@ -1,6 +1,6 @@
 # Covid Report App
 
-Link to the running app: https://jesualdocc.github.io/covid-app-test/
+Link to running application: https://jesualdocc.github.io/covid-app-test/
 
 ### Threejs Animation
 ![Home (Globe)](https://user-images.githubusercontent.com/46726672/106687404-48b9e780-6589-11eb-87fd-0d03337d4504.jpg)
