@@ -3,8 +3,9 @@
 Link to running application: https://jesualdocc.github.io/covid-app-test/
 
 ## Features
-* Covid-19 Daily reports
-** Countries
+* Daily Covid-19 reports (World, countries, *states/provinces, *counties)
+* Predictions (cases, deaths)
+* Tweet sentiment analysis
 
 ### Threejs Animation
 ![Home (Globe)](https://user-images.githubusercontent.com/46726672/106687404-48b9e780-6589-11eb-87fd-0d03337d4504.jpg)
